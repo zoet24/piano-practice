@@ -1,5 +1,30 @@
+import { useState } from "react";
+import { ChordModal } from "./components/modals/ChordModal";
+import { ChordTable } from "./components/tables/ChordTable";
+
 function App() {
-  return <h1>Piano Practice</h1>;
+  const [selectedChord, setSelectedChord] = useState<string | null>(null);
+  const handleChordClick = (chordId: string) => {
+    setSelectedChord(chordId);
+  };
+
+  return (
+    <div>
+      <ChordTable
+        isTestMode={false}
+        // selectedItems={[]}
+        onChordClick={handleChordClick}
+        // onToggleSelection={toggleItemSelection}
+      />
+
+      <ChordModal
+        isOpen={!!selectedChord}
+        onClose={() => setSelectedChord(null)}
+        itemId={selectedChord}
+        type="chord"
+      />
+    </div>
+  );
 }
 
 export default App;
