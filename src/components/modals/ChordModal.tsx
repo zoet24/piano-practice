@@ -56,16 +56,14 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
           </TabsList>
 
           {allChords.map((ch) => {
-            const annotations: KeyAnnotation[] = [
-              ...ch.pianoKeys.map((k, i) => ({
-                keyIndex: k,
-                label: `LH ${ch.leftHand?.[i] ?? ""}`,
-              })),
-              ...ch.pianoKeys.map((k, i) => ({
-                keyIndex: k + 12,
-                label: `RH ${ch.rightHand?.[i] ?? ""}`,
-              })),
-            ];
+            const lhAnnotations = ch.pianoKeys.map((k, i) => ({
+              keyIndex: k,
+              label: `LH ${ch.leftHand?.[i] ?? ""}`,
+            }));
+            const rhAnnotations = ch.pianoKeys.map((k, i) => ({
+              keyIndex: k + 12,
+              label: `RH ${ch.rightHand?.[i] ?? ""}`,
+            }));
 
             return (
               <TabsContent key={ch.name} value={ch.name}>
@@ -85,11 +83,28 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
                       </Badge>
                     ))}
                   </div>
-                  <PianoKeys
-                    activeKeys={ch.pianoKeys}
-                    annotations={annotations}
-                    octaves={3}
-                  />
+
+                  {/* Hand view toggle */}
+                  <Tabs defaultValue="both" className="pt-2 mb-4">
+                    <TabsList className="flex w-full">
+                      <TabsTrigger value="both">Both Hands</TabsTrigger>
+                      <TabsTrigger value="left">Left Hand</TabsTrigger>
+                      <TabsTrigger value="right">Right Hand</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="both">
+                      <PianoKeys
+                        annotations={[...lhAnnotations, ...rhAnnotations]}
+                        octaves={3}
+                      />
+                    </TabsContent>
+                    <TabsContent value="left">
+                      <PianoKeys annotations={lhAnnotations} octaves={3} />
+                    </TabsContent>
+                    <TabsContent value="right">
+                      <PianoKeys annotations={rhAnnotations} octaves={3} />
+                    </TabsContent>
+                  </Tabs>
                 </div>
               </TabsContent>
             );

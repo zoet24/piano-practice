@@ -1,16 +1,11 @@
 import type { KeyAnnotation } from "../modals/ChordModal";
 
 interface PianoKeysProps {
-  activeKeys: number[];
   annotations?: KeyAnnotation[];
   octaves?: number;
 }
 
-export function PianoKeys({
-  activeKeys,
-  annotations = [],
-  octaves = 2,
-}: PianoKeysProps) {
+export function PianoKeys({ annotations = [], octaves = 2 }: PianoKeysProps) {
   const baseKeys = [
     { type: "white", note: "C" },
     { type: "black", note: "C#" },
@@ -35,39 +30,36 @@ export function PianoKeys({
     }))
   ).flat();
 
-  const rightHandKeys = activeKeys.map((k) => k + 12);
-  const allActiveKeys = [...activeKeys, ...rightHandKeys];
-
   return (
     <div className="relative flex" data-testid="piano-keys">
       {keys.map((key) => {
-        const isActive = allActiveKeys.includes(key.keyIndex);
         const keyAnnotations = annotations.filter(
           (a) => a.keyIndex === key.keyIndex
         );
+
+        // Determine background color based on annotations
+        let bgClass = "";
+        if (keyAnnotations.some((a) => a.label.startsWith("LH"))) {
+          bgClass = "bg-blue-500";
+        } else if (keyAnnotations.some((a) => a.label.startsWith("RH"))) {
+          bgClass = "bg-red-500";
+        }
 
         return (
           <div
             key={key.keyIndex}
             className={`
-              relative flex items-end justify-center
-              ${key.type === "white" ? "white-key" : "black-key"}
-              ${isActive ? "key-active" : ""}
-            `}
+                relative flex items-end justify-center
+                ${key.type === "white" ? "white-key" : "black-key"}
+                ${bgClass}
+              `}
             title={key.note}
           >
             {/* Overlay annotations */}
             {keyAnnotations.map((ann, idx) => (
               <span
                 key={idx}
-                className={`
-                  absolute text-xs font-bold rounded px-1
-                  ${
-                    ann.label.startsWith("LH")
-                      ? "bg-blue-500 text-white"
-                      : "bg-red-500 text-white"
-                  }
-                `}
+                className="absolute text-xs font-bold rounded px-1 text-white"
                 style={{
                   top: ann.label.startsWith("LH") ? "10%" : "60%",
                 }}
