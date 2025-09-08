@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { CHORD_NOTES, CHORD_TYPES, CHORDS } from "@/data/chords";
-import { generateInversions } from "../../hooks/generateInversions";
 
 interface ChordTableProps {
   isTestMode: boolean;
@@ -54,9 +53,6 @@ ChordTableProps) {
     dim: "Dim",
     aug: "Aug",
   };
-
-  console.log(CHORDS.C);
-  console.log(generateInversions(CHORDS.C));
 
   return (
     <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">

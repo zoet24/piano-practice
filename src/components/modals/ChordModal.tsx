@@ -6,7 +6,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CHORDS, type Chord } from "@/data/chords";
+import { generateInversions } from "../../hooks/generateInversions";
 import { PianoKeys } from "../piano/PianoKeys";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 interface ChordModalProps {
   isOpen: boolean;
@@ -15,12 +17,19 @@ interface ChordModalProps {
   type: "chord" | "scale";
 }
 
+export interface KeyAnnotation {
+  keyIndex: number; // e.g. 0 = C, 4 = E, 7 = G
+  label: string; // e.g. "LH 5" or "RH 1"
+}
+
 export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
   if (!itemId) return null;
 
-  const item: Chord = CHORDS[itemId];
+  const rootChord: Chord = CHORDS[itemId];
+  if (!rootChord) return null;
 
-  if (!item) return null;
+  const inversions = generateInversions(rootChord);
+  const allChords = [rootChord, ...inversions];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -33,71 +42,59 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
             className="text-2xl font-bold"
             data-testid="text-chord-name"
           >
-            {item.fullName}
+            {rootChord.fullName}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid md:grid-cols-2 gap-6 pt-4">
-          <div>
-            <h4 className="text-lg font-semibold mb-3 text-foreground">
-              Notes
-            </h4>
-            <div className="flex flex-wrap gap-2 mb-6">
-              {item.notes.map((note, index) => (
-                <Badge
-                  key={index}
-                  variant="default"
-                  className="px-3 py-1 text-sm font-medium"
-                  data-testid={`badge-note-${note}`}
-                >
-                  {note}
-                </Badge>
-              ))}
-            </div>
+        <Tabs defaultValue={rootChord.name} className="pt-4">
+          <TabsList className="flex flex-wrap">
+            {allChords.map((ch) => (
+              <TabsTrigger key={ch.name} value={ch.name}>
+                {ch.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-            <h4 className="text-lg font-semibold mb-3 text-foreground">
-              Piano Visualization
-            </h4>
-            <PianoKeys
-              activeKeys={item.pianoKeys}
-              data-testid="piano-visualization"
-            />
-          </div>
+          {allChords.map((ch) => {
+            const annotations: KeyAnnotation[] = [
+              ...ch.pianoKeys.map((k, i) => ({
+                keyIndex: k,
+                label: `LH ${ch.leftHand?.[i] ?? ""}`,
+              })),
+              ...ch.pianoKeys.map((k, i) => ({
+                keyIndex: k + 12,
+                label: `RH ${ch.rightHand?.[i] ?? ""}`,
+              })),
+            ];
 
-          <div>
-            <h4 className="text-lg font-semibold mb-3 text-foreground">
-              Hand Positions
-            </h4>
-
-            <div className="mb-4">
-              <h5 className="font-medium text-muted-foreground mb-2">
-                Left Hand
-              </h5>
-              <div
-                className="bg-muted p-3 rounded-lg text-sm text-foreground"
-                data-testid="text-left-hand"
-              >
-                {item.leftHand.map((position, index) => (
-                  <div key={index}>{position}</div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h5 className="font-medium text-muted-foreground mb-2">
-                Right Hand
-              </h5>
-              <div
-                className="bg-muted p-3 rounded-lg text-sm text-foreground"
-                data-testid="text-right-hand"
-              >
-                {item.rightHand.map((position, index) => (
-                  <div key={index}>{position}</div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+            return (
+              <TabsContent key={ch.name} value={ch.name}>
+                <div>
+                  <h4 className="text-lg font-semibold mb-3 text-foreground">
+                    Notes
+                  </h4>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {ch.notes.map((note, index) => (
+                      <Badge
+                        key={index}
+                        variant="default"
+                        className="px-3 py-1 text-sm font-medium"
+                        data-testid={`badge-note-${note}`}
+                      >
+                        {note}
+                      </Badge>
+                    ))}
+                  </div>
+                  <PianoKeys
+                    activeKeys={ch.pianoKeys}
+                    annotations={annotations}
+                    octaves={3}
+                  />
+                </div>
+              </TabsContent>
+            );
+          })}
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

@@ -1,38 +1,83 @@
+import type { KeyAnnotation } from "../modals/ChordModal";
+
 interface PianoKeysProps {
   activeKeys: number[];
-  className?: string;
+  annotations?: KeyAnnotation[];
+  octaves?: number;
 }
 
-export function PianoKeys({ activeKeys, className = "" }: PianoKeysProps) {
-  // Piano key pattern: white keys at even indices, black keys at odd indices
-  const keys = [
-    { type: "white", note: "C", keyIndex: 0 },
-    { type: "black", note: "C#", keyIndex: 1 },
-    { type: "white", note: "D", keyIndex: 2 },
-    { type: "black", note: "D#", keyIndex: 3 },
-    { type: "white", note: "E", keyIndex: 4 },
-    { type: "white", note: "F", keyIndex: 5 },
-    { type: "black", note: "F#", keyIndex: 6 },
-    { type: "white", note: "G", keyIndex: 7 },
-    { type: "black", note: "G#", keyIndex: 8 },
-    { type: "white", note: "A", keyIndex: 9 },
-    { type: "black", note: "A#", keyIndex: 10 },
-    { type: "white", note: "B", keyIndex: 11 },
+export function PianoKeys({
+  activeKeys,
+  annotations = [],
+  octaves = 2,
+}: PianoKeysProps) {
+  const baseKeys = [
+    { type: "white", note: "C" },
+    { type: "black", note: "C#" },
+    { type: "white", note: "D" },
+    { type: "black", note: "D#" },
+    { type: "white", note: "E" },
+    { type: "white", note: "F" },
+    { type: "black", note: "F#" },
+    { type: "white", note: "G" },
+    { type: "black", note: "G#" },
+    { type: "white", note: "A" },
+    { type: "black", note: "A#" },
+    { type: "white", note: "B" },
   ];
 
+  // Expand across N octaves
+  const keys = Array.from({ length: octaves }, (_, octave) =>
+    baseKeys.map((k, i) => ({
+      ...k,
+      keyIndex: i + octave * 12,
+      note: `${k.note}${octave}`,
+    }))
+  ).flat();
+
+  const rightHandKeys = activeKeys.map((k) => k + 12);
+  const allActiveKeys = [...activeKeys, ...rightHandKeys];
+
   return (
-    <div className={`piano-keys ${className}`} data-testid="piano-keys">
-      {keys.map((key) => (
-        <div
-          key={key.keyIndex}
-          className={`
+    <div className="relative flex" data-testid="piano-keys">
+      {keys.map((key) => {
+        const isActive = allActiveKeys.includes(key.keyIndex);
+        const keyAnnotations = annotations.filter(
+          (a) => a.keyIndex === key.keyIndex
+        );
+
+        return (
+          <div
+            key={key.keyIndex}
+            className={`
+              relative flex items-end justify-center
               ${key.type === "white" ? "white-key" : "black-key"}
-              ${activeKeys.includes(key.keyIndex) ? "key-active" : ""}
+              ${isActive ? "key-active" : ""}
             `}
-          data-testid={`piano-key-${key.note}`}
-          title={key.note}
-        />
-      ))}
+            title={key.note}
+          >
+            {/* Overlay annotations */}
+            {keyAnnotations.map((ann, idx) => (
+              <span
+                key={idx}
+                className={`
+                  absolute text-xs font-bold rounded px-1
+                  ${
+                    ann.label.startsWith("LH")
+                      ? "bg-blue-500 text-white"
+                      : "bg-red-500 text-white"
+                  }
+                `}
+                style={{
+                  top: ann.label.startsWith("LH") ? "10%" : "60%",
+                }}
+              >
+                {ann.label}
+              </span>
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
