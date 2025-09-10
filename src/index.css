@@ -131,7 +131,7 @@
   }
 
   .white-key {
-    width: 24px;
+    width: 100%;
     height: 120px;
     background: white;
     border: 1px solid #ccc;
@@ -141,7 +141,7 @@
   }
 
   .black-key {
-    width: 16px;
+    width: 67%;
     height: 80px;
     background: #333;
     margin: 0 -8px;

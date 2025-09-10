@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -68,7 +67,7 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
             return (
               <TabsContent key={ch.name} value={ch.name}>
                 <div>
-                  <h4 className="text-lg font-semibold mb-3 text-foreground">
+                  {/* <h4 className="text-lg font-semibold mb-3 text-foreground">
                     Notes
                   </h4>
                   <div className="flex flex-wrap gap-2 mb-6">
@@ -82,7 +81,7 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
                         {note}
                       </Badge>
                     ))}
-                  </div>
+                  </div> */}
 
                   {/* Hand view toggle */}
                   <Tabs defaultValue="both" className="pt-2 mb-4">

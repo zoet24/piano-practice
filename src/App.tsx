@@ -10,12 +10,7 @@ function App() {
 
   return (
     <div>
-      <ChordTable
-        isTestMode={false}
-        // selectedItems={[]}
-        onChordClick={handleChordClick}
-        // onToggleSelection={toggleItemSelection}
-      />
+      <ChordTable isTestMode={false} onChordClick={handleChordClick} />
 
       <ChordModal
         isOpen={!!selectedChord}

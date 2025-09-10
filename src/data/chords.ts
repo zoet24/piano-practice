@@ -1,34 +1,32 @@
 export interface Chord {
   name: string;
   fullName: string;
-  notes: string[];
   leftHand: number[];
   rightHand: number[];
-  pianoKeys: number[]; // Piano key positions (0-11 representing C, C#, D, D#, E, F, F#, G, G#, A, A#, B)
+  pianoKeys: number[]; // Positions starting at 0 for C. Wraps every 12 semitones (mod 12).
 }
 
-export const CHORD_NOTES = [
-  "C",
-  "C#/Db",
-  "D",
-  "D#/Eb",
-  "E",
-  "F",
-  "F#/Gb",
-  "G",
-  "G#/Ab",
-  "A",
-  "A#/Bb",
-  "B",
-];
 export const CHORD_TYPES = ["major", "minor", "7th", "maj7", "min7"];
 
+export const CHORD_NOTES = [
+  { type: "white", noteSharp: "C", noteFlat: "C" },
+  { type: "black", noteSharp: "C#", noteFlat: "Db" },
+  { type: "white", noteSharp: "D", noteFlat: "D" },
+  { type: "black", noteSharp: "D#", noteFlat: "Eb" },
+  { type: "white", noteSharp: "E", noteFlat: "E" },
+  { type: "white", noteSharp: "F", noteFlat: "F" },
+  { type: "black", noteSharp: "F#", noteFlat: "Gb" },
+  { type: "white", noteSharp: "G", noteFlat: "G" },
+  { type: "black", noteSharp: "G#", noteFlat: "Ab" },
+  { type: "white", noteSharp: "A", noteFlat: "A" },
+  { type: "black", noteSharp: "A#", noteFlat: "Bb" },
+  { type: "white", noteSharp: "B", noteFlat: "B" },
+];
+
 export const CHORDS: Record<string, Chord> = {
-  // C Chords
   C: {
     name: "C",
     fullName: "C Major",
-    notes: ["C", "E", "G"],
     leftHand: [5, 3, 1],
     rightHand: [1, 3, 5],
     pianoKeys: [0, 4, 7],
@@ -36,7 +34,6 @@ export const CHORDS: Record<string, Chord> = {
   Cm: {
     name: "Cm",
     fullName: "C Minor",
-    notes: ["C", "Eb", "G"],
     leftHand: [5, 3, 1],
     rightHand: [1, 3, 5],
     pianoKeys: [0, 3, 7],
@@ -44,36 +41,37 @@ export const CHORDS: Record<string, Chord> = {
   C7: {
     name: "C7",
     fullName: "C Dominant 7th",
-    notes: ["C", "E", "G", "Bb"],
     leftHand: [5, 3, 2, 1],
     rightHand: [1, 2, 3, 5],
     pianoKeys: [0, 4, 7, 10],
   },
-  Cmaj7: {
-    name: "Cmaj7",
-    fullName: "C Major 7th",
-    notes: ["C", "E", "G", "B"],
-    leftHand: [5, 2, 3, 1],
-    rightHand: [1, 2, 3, 5],
-    pianoKeys: [0, 4, 7, 11],
-  },
-  Cm7: {
-    name: "Cm7",
-    fullName: "C Minor 7th",
-    notes: ["C", "Eb", "G", "Bb"],
-    leftHand: [5, 2, 3, 1],
-    rightHand: [1, 2, 3, 5],
-    pianoKeys: [0, 3, 7, 10],
-  },
-  // ...more chords
+  // ...
 };
 
-export function getChordsByNote(note: string): Chord[] {
-  return Object.values(CHORDS).filter((chord) =>
-    chord.name.startsWith(note.replace("/", ""))
-  );
+export function getChordsByNote(
+  note: string,
+  mode: "notes-sharp" | "notes-flat"
+): Chord[] {
+  return Object.values(CHORDS).filter((chord) => {
+    const rootIndex = chord.pianoKeys[0] % 12;
+    const root =
+      mode === "notes-sharp"
+        ? CHORD_NOTES[rootIndex].noteSharp
+        : CHORD_NOTES[rootIndex].noteFlat;
+    return root === note;
+  });
 }
 
 export function getAllChords(): Chord[] {
   return Object.values(CHORDS);
+}
+
+export function getChordNotes(
+  chord: Chord,
+  mode: "notes-sharp" | "notes-flat"
+) {
+  return chord.pianoKeys.map((index) => {
+    const key = CHORD_NOTES[index % 12]; // wrap to one octave
+    return mode === "notes-sharp" ? key.noteSharp : key.noteFlat;
+  });
 }
