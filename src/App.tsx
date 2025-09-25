@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChordModal } from "./components/modals/ChordModal";
 import { ChordTable } from "./components/tables/ChordTable";
+import { NoteModeProvider } from "./contexts/NoteModeContext";
 
 function App() {
   const [selectedChord, setSelectedChord] = useState<string | null>(null);
@@ -9,16 +10,17 @@ function App() {
   };
 
   return (
-    <div>
-      <ChordTable isTestMode={false} onChordClick={handleChordClick} />
-
-      <ChordModal
-        isOpen={!!selectedChord}
-        onClose={() => setSelectedChord(null)}
-        itemId={selectedChord}
-        type="chord"
-      />
-    </div>
+    <NoteModeProvider>
+      <div>
+        <ChordTable isTestMode={false} onChordClick={handleChordClick} />
+        <ChordModal
+          isOpen={!!selectedChord}
+          onClose={() => setSelectedChord(null)}
+          itemId={selectedChord}
+          type="chord"
+        />
+      </div>
+    </NoteModeProvider>
   );
 }
 

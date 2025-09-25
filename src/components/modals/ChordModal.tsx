@@ -4,9 +4,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CHORDS, type Chord } from "@/data/chords";
+import { CHORDS, getChordNotes, type Chord } from "@/data/chords";
+import { useState } from "react";
+import { useNoteMode } from "../../contexts/NoteModeContext";
 import { generateInversions } from "../../hooks/generateInversions";
 import { PianoKeys } from "../piano/PianoKeys";
+import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 interface ChordModalProps {
@@ -27,8 +30,15 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
   const rootChord: Chord = CHORDS[itemId];
   if (!rootChord) return null;
 
+  const { mode } = useNoteMode();
+
   const inversions = generateInversions(rootChord);
   const allChords = [rootChord, ...inversions];
+
+  const [selectedChordName, setSelectedChordName] = useState(rootChord.name);
+  const selectedChord =
+    allChords.find((ch) => ch.name === selectedChordName) ?? rootChord;
+  const selectedChordNotes = getChordNotes(selectedChord, mode);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -37,22 +47,41 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
         data-testid="modal-chord-details"
       >
         <DialogHeader>
-          <DialogTitle
-            className="text-2xl font-bold"
-            data-testid="text-chord-name"
-          >
-            {rootChord.fullName}
-          </DialogTitle>
+          <div className="flex flex-col items-center gap-2">
+            <DialogTitle
+              className="text-2xl font-bold"
+              data-testid="text-chord-name"
+            >
+              {selectedChord.fullName}:
+            </DialogTitle>
+            <div className="flex gap-2">
+              {selectedChordNotes.map((note, index) => (
+                <Badge
+                  key={index}
+                  variant="default"
+                  className="px-3 py-1 text-sm font-medium"
+                  data-testid={`badge-note-${note}`}
+                >
+                  {note}
+                </Badge>
+              ))}
+            </div>
+          </div>
         </DialogHeader>
 
-        <Tabs defaultValue={rootChord.name} className="pt-4">
-          <TabsList className="flex flex-wrap">
-            {allChords.map((ch) => (
-              <TabsTrigger key={ch.name} value={ch.name}>
-                {ch.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        <Tabs
+          defaultValue={rootChord.name}
+          onValueChange={(val) => setSelectedChordName(val)}
+        >
+          <div className="flex">
+            <TabsList className="w-full">
+              {allChords.map((ch) => (
+                <TabsTrigger key={ch.name} value={ch.name}>
+                  {ch.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
           {allChords.map((ch) => {
             const lhAnnotations = ch.pianoKeys.map((k, i) => ({
@@ -66,45 +95,26 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
 
             return (
               <TabsContent key={ch.name} value={ch.name}>
-                <div>
-                  {/* <h4 className="text-lg font-semibold mb-3 text-foreground">
-                    Notes
-                  </h4>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {ch.notes.map((note, index) => (
-                      <Badge
-                        key={index}
-                        variant="default"
-                        className="px-3 py-1 text-sm font-medium"
-                        data-testid={`badge-note-${note}`}
-                      >
-                        {note}
-                      </Badge>
-                    ))}
-                  </div> */}
+                <Tabs defaultValue="both">
+                  <TabsList className="flex w-full">
+                    <TabsTrigger value="left">Left Hand</TabsTrigger>
+                    <TabsTrigger value="both">Both Hands</TabsTrigger>
+                    <TabsTrigger value="right">Right Hand</TabsTrigger>
+                  </TabsList>
 
-                  {/* Hand view toggle */}
-                  <Tabs defaultValue="both" className="pt-2 mb-4">
-                    <TabsList className="flex w-full">
-                      <TabsTrigger value="both">Both Hands</TabsTrigger>
-                      <TabsTrigger value="left">Left Hand</TabsTrigger>
-                      <TabsTrigger value="right">Right Hand</TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="both">
-                      <PianoKeys
-                        annotations={[...lhAnnotations, ...rhAnnotations]}
-                        octaves={3}
-                      />
-                    </TabsContent>
-                    <TabsContent value="left">
-                      <PianoKeys annotations={lhAnnotations} octaves={3} />
-                    </TabsContent>
-                    <TabsContent value="right">
-                      <PianoKeys annotations={rhAnnotations} octaves={3} />
-                    </TabsContent>
-                  </Tabs>
-                </div>
+                  <TabsContent value="both">
+                    <PianoKeys
+                      annotations={[...lhAnnotations, ...rhAnnotations]}
+                      octaves={3}
+                    />
+                  </TabsContent>
+                  <TabsContent value="left">
+                    <PianoKeys annotations={lhAnnotations} octaves={3} />
+                  </TabsContent>
+                  <TabsContent value="right">
+                    <PianoKeys annotations={rhAnnotations} octaves={3} />
+                  </TabsContent>
+                </Tabs>
               </TabsContent>
             );
           })}

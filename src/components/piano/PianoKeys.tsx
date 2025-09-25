@@ -35,7 +35,7 @@ export function PianoKeys({ annotations = [], octaves = 2 }: PianoKeysProps) {
 
   return (
     <div
-      className="relative flex cursor-pointer"
+      className="relative flex cursor-pointer py-4"
       data-testid="piano-keys"
       onClick={handleClick}
     >
@@ -79,17 +79,24 @@ export function PianoKeys({ annotations = [], octaves = 2 }: PianoKeysProps) {
               viewMode === "notes-sharp" ||
               viewMode === "notes-flat") &&
               keyAnnotations.map((ann, idx) => (
-                <span
+                <div
                   key={idx}
-                  className={`absolute text-xs font-bold rounded px-1 text-white`}
+                  className="absolute top-[50%] text-xs font-bold bg-white rounded-full w-5 h-5 flex items-center justify-center outline-2 z-20"
                   style={{
-                    backgroundColor: ann.label.startsWith("LH")
+                    transform: "translate(0, -50%)",
+                    outlineColor: ann.label.startsWith("LH")
                       ? "#3b82f6"
                       : "#ef4444",
                   }}
                 >
-                  {ann.label}
-                </span>
+                  <span
+                    style={{
+                      color: ann.label.startsWith("LH") ? "#3b82f6" : "#ef4444",
+                    }}
+                  >
+                    {ann.label.slice(3)}
+                  </span>
+                </div>
               ))}
 
             {/* Bottom notes */}

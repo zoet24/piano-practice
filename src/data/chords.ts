@@ -48,30 +48,12 @@ export const CHORDS: Record<string, Chord> = {
   // ...
 };
 
-export function getChordsByNote(
-  note: string,
-  mode: "notes-sharp" | "notes-flat"
-): Chord[] {
-  return Object.values(CHORDS).filter((chord) => {
-    const rootIndex = chord.pianoKeys[0] % 12;
-    const root =
-      mode === "notes-sharp"
-        ? CHORD_NOTES[rootIndex].noteSharp
-        : CHORD_NOTES[rootIndex].noteFlat;
-    return root === note;
-  });
-}
-
-export function getAllChords(): Chord[] {
-  return Object.values(CHORDS);
-}
-
 export function getChordNotes(
   chord: Chord,
   mode: "notes-sharp" | "notes-flat"
-) {
-  return chord.pianoKeys.map((index) => {
-    const key = CHORD_NOTES[index % 12]; // wrap to one octave
+): string[] {
+  return chord.pianoKeys.map((keyIndex) => {
+    const key = CHORD_NOTES[keyIndex % 12]; // wrap around a single octave
     return mode === "notes-sharp" ? key.noteSharp : key.noteFlat;
   });
 }
