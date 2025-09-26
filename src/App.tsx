@@ -9,6 +9,8 @@ function App() {
     setSelectedChord(chordId);
   };
 
+  // console.log(CHORDS);
+
   return (
     <NoteModeProvider>
       <div>

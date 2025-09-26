@@ -24,6 +24,34 @@ export interface KeyAnnotation {
   label: string; // e.g. "LH 5" or "RH 1"
 }
 
+function mapChordKeysToAnnotations(ch: Chord) {
+  const lhAnnotations: KeyAnnotation[] = [];
+  const rhAnnotations: KeyAnnotation[] = [];
+
+  let lastKey = -1; // track previous key index for octave adjustment
+
+  ch.pianoKeys.forEach((k, i) => {
+    // Adjust LH keyIndex so it’s always ascending
+    let keyIndex = k;
+    if (keyIndex <= lastKey) keyIndex += 12;
+    lastKey = keyIndex;
+
+    lhAnnotations.push({
+      keyIndex,
+      label: `LH ${ch.leftHand?.[i] ?? ""}`,
+    });
+
+    rhAnnotations.push({
+      keyIndex: keyIndex + 12, // RH one octave higher
+      label: `RH ${ch.rightHand?.[i] ?? ""}`,
+    });
+  });
+
+  console.log(ch, lhAnnotations);
+
+  return { lhAnnotations, rhAnnotations };
+}
+
 export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
   if (!itemId) return null;
 
@@ -33,8 +61,7 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
   const notes = useNotes(); // Notes respect sharp/flat context
 
   const inversions = generateInversions(rootChord, notes);
-  // const allChords = [rootChord, ...inversions];
-  const allChords = [rootChord];
+  const allChords = [rootChord, ...inversions];
 
   const [selectedChordName, setSelectedChordName] = useState(rootChord.name);
   const selectedChord =
@@ -42,6 +69,9 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
   const selectedChordNotes = selectedChord.pianoKeys.map(
     (k) => notes[k % 12].note
   );
+
+  const { lhAnnotations, rhAnnotations } =
+    mapChordKeysToAnnotations(selectedChord);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -80,14 +110,16 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
           </div>
 
           {allChords.map((ch) => {
-            const lhAnnotations = ch.pianoKeys.map((k, i) => ({
-              keyIndex: k,
-              label: `LH ${ch.leftHand?.[i] ?? ""}`,
-            }));
-            const rhAnnotations = ch.pianoKeys.map((k, i) => ({
-              keyIndex: k + 12,
-              label: `RH ${ch.rightHand?.[i] ?? ""}`,
-            }));
+            // const lhAnnotations = ch.pianoKeys.map((k, i) => ({
+            //   keyIndex: k,
+            //   label: `LH ${ch.leftHand?.[i] ?? ""}`,
+            // }));
+            // const rhAnnotations = ch.pianoKeys.map((k, i) => ({
+            //   keyIndex: k + 12,
+            //   label: `RH ${ch.rightHand?.[i] ?? ""}`,
+            // }));
+
+            // console.log(ch, lhAnnotations);
 
             return (
               <TabsContent key={ch.name} value={ch.name}>

@@ -3,9 +3,6 @@ import type { Note } from "../data/notes";
 
 export type DisplayChord = Chord & { notes: string[] };
 
-/**
- * Generates inversions for a chord using a provided notes array (context-aware sharp/flat)
- */
 export function generateInversions(
   chord: Chord,
   notes: Note[]
@@ -15,13 +12,24 @@ export function generateInversions(
   if (numNotes < 2) return inversions;
 
   for (let i = 1; i < numNotes; i++) {
-    // Rotate piano keys and push wrapped notes up an octave
-    const rotatedKeys = chord.pianoKeys
-      .slice(i)
-      .concat(chord.pianoKeys.slice(0, i).map((k) => k + 12));
+    // Rotate chord
+    const rotatedKeys = [
+      ...chord.pianoKeys.slice(i),
+      ...chord.pianoKeys.slice(0, i),
+    ];
 
-    // Derive note names from the provided notes array
-    const rotatedNotes = rotatedKeys.map((k) => notes[k % 12].note);
+    // Ensure strictly ascending keys
+    const normalizedKeys: number[] = [];
+    let lastKey = -1;
+    for (const k of rotatedKeys) {
+      let keyIndex = k;
+      while (keyIndex <= lastKey) keyIndex += 12;
+      normalizedKeys.push(keyIndex);
+      lastKey = keyIndex;
+    }
+
+    // Map to note names
+    const rotatedNotes = normalizedKeys.map((k) => notes[k % 12].note);
 
     const inversionName = `${chord.name}/${rotatedNotes[0]}`;
     const inversionFullName = `${chord.fullName} ${ordinal(i)} Inversion`;
@@ -30,7 +38,7 @@ export function generateInversions(
       ...chord,
       name: inversionName,
       fullName: inversionFullName,
-      pianoKeys: rotatedKeys,
+      pianoKeys: normalizedKeys,
       notes: rotatedNotes,
     });
   }

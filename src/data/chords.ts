@@ -21,7 +21,7 @@ const CHORD_FORMULAS: Record<
   min7: { fullName: "Minor 7th", intervals: [0, 3, 7, 10] },
 };
 
-export function generateAllChords(): Record<string, Chord> {
+function generateAllChords(): Record<string, Chord> {
   const chords: Record<string, Chord> = {};
 
   NOTES.forEach((note, rootIndex) => {
@@ -37,14 +37,21 @@ export function generateAllChords(): Record<string, Chord> {
       const fullChordName =
         note.noteSharp + " " + (type === "major" ? "Major" : fullName);
 
-      const pianoKeys = intervals.map((i) => (rootIndex + i) % 12);
+      // generate piano keys in ascending order from root
+      const pianoKeys = intervals
+        .map((i) => (rootIndex + i) % 12)
+        .sort(
+          (a, b) => ((a - rootIndex + 12) % 12) - ((b - rootIndex + 12) % 12)
+        );
 
-      // basic hand fingering
-      const leftHand = intervals
-        .map((_, i) => 5 - i)
+      // left hand: root at bottom, ascending
+      const leftHand = pianoKeys
         .slice(0, 5)
+        .map((_, i) => i + 1)
         .reverse();
-      const rightHand = intervals.map((_, i) => (i < 4 ? i + 1 : 5));
+
+      // right hand: root at bottom, ascending
+      const rightHand = pianoKeys.map((_, i) => i + 1);
 
       chords[name] = {
         name,
