@@ -1,20 +1,20 @@
-import { useState } from "react";
 import { useNotes } from "../../data/notes";
-import type { KeyAnnotation } from "../modals/ChordModal";
+import type { KeyAnnotation, ViewMode } from "../modals/ChordModal";
 
 interface PianoKeysProps {
   annotations?: KeyAnnotation[];
   octaves?: number;
+  viewMode?: ViewMode;
+  onViewModeChange?: () => void;
 }
-
-type ViewMode = "none" | "annotations" | "notes-sharp" | "notes-flat";
 
 export const PianoKeys: React.FC<PianoKeysProps> = ({
   annotations = [],
   octaves = 2,
+  viewMode = "none",
+  onViewModeChange,
 }) => {
-  const notes = useNotes(); // sharp/flat notes from context
-  const [viewMode, setViewMode] = useState<"none" | "annotations">("none");
+  const notes = useNotes();
 
   // Expand keys across N octaves
   const keys = Array.from({ length: octaves }, (_, octave) =>
@@ -24,15 +24,11 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
     }))
   ).flat();
 
-  const handleClick = () => {
-    setViewMode((prev) => (prev === "none" ? "annotations" : "none"));
-  };
-
   return (
     <div
       className="relative flex cursor-pointer py-4"
       data-testid="piano-keys"
-      onClick={handleClick}
+      onClick={onViewModeChange}
     >
       {keys.map((key) => {
         const keyAnnotations = annotations.filter(
@@ -52,6 +48,17 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
           keyClass += " outline outline-black";
         }
 
+        let noteClass = "";
+        if (
+          keyAnnotations.some(
+            (a) => a.label.startsWith("LH") || a.label.startsWith("RH")
+          )
+        ) {
+          noteClass = "text-black";
+        } else {
+          noteClass = "text-gray-400";
+        }
+
         return (
           <div
             key={key.keyIndex}
@@ -63,8 +70,18 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
             `}
             title={key.note}
           >
+            {/* Top notes (for black keys) */}
+            {(viewMode === "notes" || viewMode === "all") &&
+              key.type === "black" && (
+                <span
+                  className={`absolute -top-5 text-xs font-bold ${noteClass}`}
+                >
+                  {key.note}
+                </span>
+              )}
+
             {/* Overlay annotations */}
-            {viewMode === "annotations" &&
+            {(viewMode === "annotations" || viewMode === "all") &&
               keyAnnotations.map((ann, idx) => (
                 <div
                   key={idx}
@@ -85,6 +102,16 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
                   </span>
                 </div>
               ))}
+
+            {/* Bottom notes (for white keys) */}
+            {(viewMode === "notes" || viewMode === "all") &&
+              key.type === "white" && (
+                <span
+                  className={`absolute -bottom-5 text-xs font-bold ${noteClass}`}
+                >
+                  {key.note}
+                </span>
+              )}
           </div>
         );
       })}

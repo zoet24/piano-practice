@@ -18,11 +18,10 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
   };
 
   const getChordId = (note: string, type: string): string => {
-    // Find the corresponding CHORD_NOTES entry to get the sharp version
     const noteEntry = NOTES.find(
       (n) => n.noteSharp === note || n.noteFlat === note
     );
-    const root = noteEntry?.noteSharp ?? note; // fallback to input
+    const root = noteEntry?.noteSharp ?? note;
 
     switch (type) {
       case "major":
@@ -34,7 +33,7 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
       case "maj7":
         return `${root}maj7`;
       case "min7":
-        return `${root}m7`;
+        return `${root}min7`;
       case "dim":
         return `${root}dim`;
       case "aug":
@@ -75,6 +74,8 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
                   {Object.entries(CHORD_TYPES).map(([type]) => {
                     const chordId = getChordId(noteLabel, type);
                     const chord = CHORDS[chordId];
+
+                    console.log(chordId, chord);
 
                     if (!chord) {
                       return (
