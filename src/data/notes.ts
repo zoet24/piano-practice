@@ -1,11 +1,11 @@
 import { useNoteMode } from "../contexts/NoteModeContext";
 
-interface Note {
+export interface Note {
   type: "white" | "black";
   note: string;
 }
 
-const NOTES = [
+export const NOTES = [
   { type: "white", noteSharp: "C", noteFlat: "C" },
   { type: "black", noteSharp: "C#", noteFlat: "Db" },
   { type: "white", noteSharp: "D", noteFlat: "D" },
@@ -25,6 +25,6 @@ export function useNotes(): Note[] {
 
   return NOTES.map((key) => ({
     type: key.type,
-    note: mode === "notes-sharp" ? key.noteSharp : key.noteSharp,
+    note: mode === "notes-sharp" ? key.noteSharp : key.noteFlat,
   }));
 }

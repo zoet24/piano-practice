@@ -1,11 +1,14 @@
 import type { Chord } from "../data/chords";
-import { CHORD_NOTES } from "../data/chords";
+import type { Note } from "../data/notes";
 
 export type DisplayChord = Chord & { notes: string[] };
 
+/**
+ * Generates inversions for a chord using a provided notes array (context-aware sharp/flat)
+ */
 export function generateInversions(
   chord: Chord,
-  mode: "notes-sharp" | "notes-flat" = "notes-sharp"
+  notes: Note[]
 ): DisplayChord[] {
   const inversions: DisplayChord[] = [];
   const numNotes = chord.pianoKeys.length;
@@ -17,11 +20,8 @@ export function generateInversions(
       .slice(i)
       .concat(chord.pianoKeys.slice(0, i).map((k) => k + 12));
 
-    // Derive note names from CHORD_NOTES and chosen mode
-    const rotatedNotes = rotatedKeys.map((k) => {
-      const key = CHORD_NOTES[k % 12];
-      return mode === "notes-sharp" ? key.noteSharp : key.noteFlat;
-    });
+    // Derive note names from the provided notes array
+    const rotatedNotes = rotatedKeys.map((k) => notes[k % 12].note);
 
     const inversionName = `${chord.name}/${rotatedNotes[0]}`;
     const inversionFullName = `${chord.fullName} ${ordinal(i)} Inversion`;

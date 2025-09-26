@@ -13,7 +13,7 @@ const NoteModeContext = createContext<NoteModeContextType | undefined>(
 );
 
 export function NoteModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<NoteMode>("notes-sharp");
+  const [mode, setMode] = useState<NoteMode>("notes-flat");
 
   const toggleMode = () => {
     setMode((prev) => (prev === "notes-sharp" ? "notes-flat" : "notes-sharp"));

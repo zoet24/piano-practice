@@ -4,9 +4,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CHORDS, getChordNotes, type Chord } from "@/data/chords";
+import { CHORDS, type Chord } from "@/data/chords";
 import { useState } from "react";
-import { useNoteMode } from "../../contexts/NoteModeContext";
+import { useNotes } from "../../data/notes";
 import { generateInversions } from "../../hooks/generateInversions";
 import { PianoKeys } from "../piano/PianoKeys";
 import { Badge } from "../ui/badge";
@@ -30,29 +30,26 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
   const rootChord: Chord = CHORDS[itemId];
   if (!rootChord) return null;
 
-  const { mode } = useNoteMode();
+  const notes = useNotes(); // Notes respect sharp/flat context
 
-  const inversions = generateInversions(rootChord);
-  const allChords = [rootChord, ...inversions];
+  const inversions = generateInversions(rootChord, notes);
+  // const allChords = [rootChord, ...inversions];
+  const allChords = [rootChord];
 
   const [selectedChordName, setSelectedChordName] = useState(rootChord.name);
   const selectedChord =
     allChords.find((ch) => ch.name === selectedChordName) ?? rootChord;
-  const selectedChordNotes = getChordNotes(selectedChord, mode);
+  const selectedChordNotes = selectedChord.pianoKeys.map(
+    (k) => notes[k % 12].note
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        className="max-w-2xl max-h-[90vh] overflow-y-auto"
-        data-testid="modal-chord-details"
-      >
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex flex-col items-center gap-2">
-            <DialogTitle
-              className="text-2xl font-bold"
-              data-testid="text-chord-name"
-            >
-              {selectedChord.fullName}:
+            <DialogTitle className="text-2xl font-bold">
+              {selectedChord.fullName}
             </DialogTitle>
             <div className="flex gap-2">
               {selectedChordNotes.map((note, index) => (
@@ -60,7 +57,6 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
                   key={index}
                   variant="default"
                   className="px-3 py-1 text-sm font-medium"
-                  data-testid={`badge-note-${note}`}
                 >
                   {note}
                 </Badge>
@@ -84,16 +80,13 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
           </div>
 
           {allChords.map((ch) => {
-            console.log(ch);
             const lhAnnotations = ch.pianoKeys.map((k, i) => ({
               keyIndex: k,
               label: `LH ${ch.leftHand?.[i] ?? ""}`,
-              // inChord: ch.notes.includes(ch.leftHand?.[i] ?? ""),
             }));
             const rhAnnotations = ch.pianoKeys.map((k, i) => ({
               keyIndex: k + 12,
               label: `RH ${ch.rightHand?.[i] ?? ""}`,
-              // inChord: ch.notes.includes(ch.rightHand?.[i] ?? ""),
             }));
 
             return (

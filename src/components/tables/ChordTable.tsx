@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { CHORD_NOTES, CHORD_TYPES, CHORDS } from "@/data/chords";
+import { CHORD_TYPES, CHORDS } from "@/data/chords";
+import { useNotes } from "../../data/notes";
 
 interface ChordTableProps {
   isTestMode: boolean;
@@ -7,6 +8,8 @@ interface ChordTableProps {
 }
 
 export function ChordTable({ isTestMode, onChordClick }: ChordTableProps) {
+  const notes = useNotes(); // notes in current sharp/flat mode
+
   const handleCellClick = (chordId: string) => {
     if (!isTestMode) {
       onChordClick(chordId);
@@ -14,24 +17,23 @@ export function ChordTable({ isTestMode, onChordClick }: ChordTableProps) {
   };
 
   const getChordId = (note: string, type: string): string => {
-    const cleanNote = note.split("/")[0]; // Use first part for sharp/flat notes
     switch (type) {
       case "major":
-        return cleanNote;
+        return note;
       case "minor":
-        return `${cleanNote}m`;
+        return `${note}m`;
       case "7th":
-        return `${cleanNote}7`;
+        return `${note}7`;
       case "maj7":
-        return `${cleanNote}maj7`;
+        return `${note}maj7`;
       case "min7":
-        return `${cleanNote}m7`;
+        return `${note}m7`;
       case "dim":
-        return `${cleanNote}dim`;
+        return `${note}dim`;
       case "aug":
-        return `${cleanNote}aug`;
+        return `${note}aug`;
       default:
-        return cleanNote;
+        return note;
     }
   };
 
@@ -65,17 +67,16 @@ export function ChordTable({ isTestMode, onChordClick }: ChordTableProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {CHORD_NOTES.map((noteObj, idx) => {
-              // use sharp version as default label
-              const note = noteObj.noteSharp;
+            {notes.map((noteObj, idx) => {
+              const noteLabel = noteObj.note;
 
               return (
                 <tr key={idx}>
                   <td className="px-4 py-3 font-semibold text-foreground">
-                    {noteObj.noteSharp}/{noteObj.noteFlat}
+                    {noteLabel}
                   </td>
                   {CHORD_TYPES.map((type) => {
-                    const chordId = getChordId(note, type);
+                    const chordId = getChordId(noteLabel, type);
                     const chord = CHORDS[chordId];
 
                     if (!chord) {
@@ -94,9 +95,7 @@ export function ChordTable({ isTestMode, onChordClick }: ChordTableProps) {
                           variant="outline"
                           size="sm"
                           onClick={() => handleCellClick(chordId)}
-                          className={`
-                            chord-cell w-full px-3 py-2 text-sm transition-all duration-200
-                          `}
+                          className="chord-cell w-full px-3 py-2 text-sm transition-all duration-200"
                           data-testid={`chord-${chordId}`}
                         >
                           {chord.name}

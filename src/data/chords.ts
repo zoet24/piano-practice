@@ -1,3 +1,5 @@
+import { NOTES } from "./notes";
+
 export interface Chord {
   name: string;
   fullName: string;
@@ -22,21 +24,22 @@ const CHORD_FORMULAS: Record<
 export function generateAllChords(): Record<string, Chord> {
   const chords: Record<string, Chord> = {};
 
-  CHORD_NOTES.forEach((note, rootIndex) => {
+  NOTES.forEach((note, rootIndex) => {
     for (const [type, { fullName, intervals }] of Object.entries(
       CHORD_FORMULAS
     )) {
+      // internal name (always sharp-based, stable ID)
       const name =
         type === "major"
-          ? note.noteSharp // e.g. "C"
-          : note.noteSharp + (type === "minor" ? "m" : type); // e.g. "Cm", "C7"
+          ? note.noteSharp
+          : note.noteSharp + (type === "minor" ? "m" : type);
 
       const fullChordName =
         note.noteSharp + " " + (type === "major" ? "Major" : fullName);
 
       const pianoKeys = intervals.map((i) => (rootIndex + i) % 12);
 
-      // Simple hand fingering (can refine later)
+      // basic hand fingering
       const leftHand = intervals
         .map((_, i) => 5 - i)
         .slice(0, 5)
@@ -57,16 +60,6 @@ export function generateAllChords(): Record<string, Chord> {
 }
 
 export const CHORDS: Record<string, Chord> = generateAllChords();
-
-export function getChordNotes(
-  chord: Chord,
-  mode: "notes-sharp" | "notes-flat"
-): string[] {
-  return chord.pianoKeys.map((keyIndex) => {
-    const key = CHORD_NOTES[keyIndex % 12]; // wrap around a single octave
-    return mode === "notes-sharp" ? key.noteSharp : key.noteFlat;
-  });
-}
 
 // export const CHORDS: Record<string, Chord> = {
 //   C: {
