@@ -33,6 +33,8 @@ export function PianoKeys({ annotations = [], octaves = 2 }: PianoKeysProps) {
     setViewMode(modes[nextIndex]);
   };
 
+  console.log(annotations);
+
   return (
     <div
       className="relative flex cursor-pointer py-4"
@@ -45,11 +47,16 @@ export function PianoKeys({ annotations = [], octaves = 2 }: PianoKeysProps) {
         );
 
         // Determine background color based on annotations
-        let bgClass = "";
+        let keyClass = "";
         if (keyAnnotations.some((a) => a.label.startsWith("LH"))) {
-          bgClass = "bg-blue-500";
+          keyClass = "bg-blue-500";
         } else if (keyAnnotations.some((a) => a.label.startsWith("RH"))) {
-          bgClass = "bg-red-500";
+          keyClass = "bg-red-500";
+        }
+
+        // Add outline if black key has annotations
+        if (key.type === "black" && keyAnnotations.length > 0) {
+          keyClass += " outline outline-black";
         }
 
         return (
@@ -62,7 +69,7 @@ export function PianoKeys({ annotations = [], octaves = 2 }: PianoKeysProps) {
                   (key.noteSharp === "B" || key.noteSharp === "E") &&
                   `mr-[-1px]`
                 }
-                ${bgClass}
+                ${keyClass}
               `}
             title={key.noteSharp}
           >

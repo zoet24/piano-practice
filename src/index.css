@@ -148,8 +148,4 @@
     z-index: 10;
     border-radius: 0 0 2px 2px;
   }
-
-  .key-active {
-    background: hsl(221.2, 83.2%, 53.3%) !important;
-  }
 }

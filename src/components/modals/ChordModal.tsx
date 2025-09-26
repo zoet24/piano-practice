@@ -84,13 +84,16 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
           </div>
 
           {allChords.map((ch) => {
+            console.log(ch);
             const lhAnnotations = ch.pianoKeys.map((k, i) => ({
               keyIndex: k,
               label: `LH ${ch.leftHand?.[i] ?? ""}`,
+              // inChord: ch.notes.includes(ch.leftHand?.[i] ?? ""),
             }));
             const rhAnnotations = ch.pianoKeys.map((k, i) => ({
               keyIndex: k + 12,
               label: `RH ${ch.rightHand?.[i] ?? ""}`,
+              // inChord: ch.notes.includes(ch.rightHand?.[i] ?? ""),
             }));
 
             return (
