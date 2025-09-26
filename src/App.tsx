@@ -3,7 +3,7 @@ import { ChordModal } from "./components/modals/ChordModal";
 import { ChordTable } from "./components/tables/ChordTable";
 import { NoteModeProvider } from "./contexts/NoteModeContext";
 
-function App() {
+const App: React.FC = () => {
   const [selectedChord, setSelectedChord] = useState<string | null>(null);
   const handleChordClick = (chordId: string) => {
     setSelectedChord(chordId);
@@ -24,6 +24,6 @@ function App() {
       </div>
     </NoteModeProvider>
   );
-}
+};
 
 export default App;

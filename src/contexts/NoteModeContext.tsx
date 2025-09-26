@@ -12,7 +12,7 @@ const NoteModeContext = createContext<NoteModeContextType | undefined>(
   undefined
 );
 
-export function NoteModeProvider({ children }: { children: ReactNode }) {
+export const NoteModeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setMode] = useState<NoteMode>("notes-flat");
 
   const toggleMode = () => {
@@ -24,12 +24,12 @@ export function NoteModeProvider({ children }: { children: ReactNode }) {
       {children}
     </NoteModeContext.Provider>
   );
-}
+};
 
-export function useNoteMode() {
+export const useNoteMode = () => {
   const context = useContext(NoteModeContext);
   if (!context) {
     throw new Error("useNoteMode must be used within a NoteModeProvider");
   }
   return context;
-}
+};

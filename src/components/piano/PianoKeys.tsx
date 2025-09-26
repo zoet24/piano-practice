@@ -9,7 +9,10 @@ interface PianoKeysProps {
 
 type ViewMode = "none" | "annotations" | "notes-sharp" | "notes-flat";
 
-export function PianoKeys({ annotations = [], octaves = 2 }: PianoKeysProps) {
+export const PianoKeys: React.FC<PianoKeysProps> = ({
+  annotations = [],
+  octaves = 2,
+}) => {
   const notes = useNotes(); // sharp/flat notes from context
   const [viewMode, setViewMode] = useState<"none" | "annotations">("none");
 
@@ -87,4 +90,4 @@ export function PianoKeys({ annotations = [], octaves = 2 }: PianoKeysProps) {
       })}
     </div>
   );
-}
+};

@@ -3,10 +3,10 @@ import type { Note } from "../data/notes";
 
 export type DisplayChord = Chord & { notes: string[] };
 
-export function generateInversions(
+export const generateInversions = (
   chord: Chord,
   notes: Note[]
-): DisplayChord[] {
+): DisplayChord[] => {
   const inversions: DisplayChord[] = [];
   const numNotes = chord.pianoKeys.length;
   if (numNotes < 2) return inversions;
@@ -44,11 +44,11 @@ export function generateInversions(
   }
 
   return inversions;
-}
+};
 
-function ordinal(n: number): string {
+const ordinal = (n: number): string => {
   if (n === 1) return "1st";
   if (n === 2) return "2nd";
   if (n === 3) return "3rd";
   return `${n}th`;
-}
+};

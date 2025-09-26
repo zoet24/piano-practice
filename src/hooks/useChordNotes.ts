@@ -2,7 +2,7 @@ import { useNoteMode } from "../contexts/NoteModeContext";
 import type { Chord } from "../data/chords";
 import { NOTES } from "../data/notes";
 
-export function useChordNotes(chord: Chord) {
+export const useChordNotes = (chord: Chord) => {
   const { mode } = useNoteMode();
 
   // Convert piano keys into visible notes
@@ -27,4 +27,4 @@ export function useChordNotes(chord: Chord) {
     rootName,
     fullName,
   };
-}
+};

@@ -24,7 +24,7 @@ export interface KeyAnnotation {
   label: string; // e.g. "LH 5" or "RH 1"
 }
 
-function mapChordKeysToAnnotations(ch: Chord) {
+const mapChordKeysToAnnotations = (ch: Chord) => {
   const lhAnnotations: KeyAnnotation[] = [];
   const rhAnnotations: KeyAnnotation[] = [];
 
@@ -50,9 +50,14 @@ function mapChordKeysToAnnotations(ch: Chord) {
   console.log(ch, lhAnnotations);
 
   return { lhAnnotations, rhAnnotations };
-}
+};
 
-export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
+export const ChordModal = ({
+  isOpen,
+  onClose,
+  itemId,
+  type,
+}: ChordModalProps) => {
   if (!itemId) return null;
 
   const rootChord: Chord = CHORDS[itemId];
@@ -150,4 +155,4 @@ export function ChordModal({ isOpen, onClose, itemId, type }: ChordModalProps) {
       </DialogContent>
     </Dialog>
   );
-}
+};

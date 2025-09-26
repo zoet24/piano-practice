@@ -7,7 +7,7 @@ interface ChordTableProps {
   onChordClick: (chordId: string) => void;
 }
 
-export function ChordTable({ isTestMode, onChordClick }: ChordTableProps) {
+export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
   const notes = useNotes(); // notes in current sharp/flat mode
 
   const handleCellClick = (chordId: string) => {
@@ -111,4 +111,4 @@ export function ChordTable({ isTestMode, onChordClick }: ChordTableProps) {
       </div>
     </div>
   );
-}
+};

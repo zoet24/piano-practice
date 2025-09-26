@@ -20,11 +20,11 @@ export const NOTES = [
   { type: "white", noteSharp: "B", noteFlat: "B" },
 ] as const;
 
-export function useNotes(): Note[] {
+export const useNotes = (): Note[] => {
   const { mode } = useNoteMode();
 
   return NOTES.map((key) => ({
     type: key.type,
     note: mode === "notes-sharp" ? key.noteSharp : key.noteFlat,
   }));
-}
+};

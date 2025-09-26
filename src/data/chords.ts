@@ -21,7 +21,7 @@ const CHORD_FORMULAS: Record<
   min7: { fullName: "Minor 7th", intervals: [0, 3, 7, 10] },
 };
 
-function generateAllChords(): Record<string, Chord> {
+const generateAllChords = (): Record<string, Chord> => {
   const chords: Record<string, Chord> = {};
 
   NOTES.forEach((note, rootIndex) => {
@@ -64,7 +64,7 @@ function generateAllChords(): Record<string, Chord> {
   });
 
   return chords;
-}
+};
 
 export const CHORDS: Record<string, Chord> = generateAllChords();
 
