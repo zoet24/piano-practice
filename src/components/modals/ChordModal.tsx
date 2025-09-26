@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { CHORDS, type Chord } from "@/data/chords";
 import { useState } from "react";
-import { useNotes } from "../../data/notes";
+import { useNoteLabel, useNotes } from "../../data/notes";
 import { generateInversions } from "../../hooks/generateInversions";
 import { PianoKeys } from "../piano/PianoKeys";
 import { Badge } from "../ui/badge";
@@ -47,8 +47,6 @@ const mapChordKeysToAnnotations = (ch: Chord) => {
     });
   });
 
-  console.log(ch, lhAnnotations);
-
   return { lhAnnotations, rhAnnotations };
 };
 
@@ -63,7 +61,8 @@ export const ChordModal = ({
   const rootChord: Chord = CHORDS[itemId];
   if (!rootChord) return null;
 
-  const notes = useNotes(); // Notes respect sharp/flat context
+  const notes = useNotes();
+  const getNoteLabel = useNoteLabel();
 
   const inversions = generateInversions(rootChord, notes);
   const allChords = [rootChord, ...inversions];
@@ -84,7 +83,7 @@ export const ChordModal = ({
         <DialogHeader>
           <div className="flex flex-col items-center gap-2">
             <DialogTitle className="text-2xl font-bold">
-              {selectedChord.fullName}
+              {getNoteLabel(selectedChord.fullName)}
             </DialogTitle>
             <div className="flex gap-2">
               {selectedChordNotes.map((note, index) => (
@@ -108,24 +107,13 @@ export const ChordModal = ({
             <TabsList className="w-full">
               {allChords.map((ch) => (
                 <TabsTrigger key={ch.name} value={ch.name}>
-                  {ch.name}
+                  {getNoteLabel(ch.name)}
                 </TabsTrigger>
               ))}
             </TabsList>
           </div>
 
           {allChords.map((ch) => {
-            // const lhAnnotations = ch.pianoKeys.map((k, i) => ({
-            //   keyIndex: k,
-            //   label: `LH ${ch.leftHand?.[i] ?? ""}`,
-            // }));
-            // const rhAnnotations = ch.pianoKeys.map((k, i) => ({
-            //   keyIndex: k + 12,
-            //   label: `RH ${ch.rightHand?.[i] ?? ""}`,
-            // }));
-
-            // console.log(ch, lhAnnotations);
-
             return (
               <TabsContent key={ch.name} value={ch.name}>
                 <Tabs defaultValue="both">

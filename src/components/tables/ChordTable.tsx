@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CHORD_TYPES, CHORDS } from "@/data/chords";
-import { useNotes } from "../../data/notes";
+import { NOTES, useNoteLabel, useNotes } from "../../data/notes";
 
 interface ChordTableProps {
   isTestMode: boolean;
@@ -8,7 +8,8 @@ interface ChordTableProps {
 }
 
 export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
-  const notes = useNotes(); // notes in current sharp/flat mode
+  const notes = useNotes();
+  const getNoteLabel = useNoteLabel();
 
   const handleCellClick = (chordId: string) => {
     if (!isTestMode) {
@@ -17,34 +18,30 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
   };
 
   const getChordId = (note: string, type: string): string => {
+    // Find the corresponding CHORD_NOTES entry to get the sharp version
+    const noteEntry = NOTES.find(
+      (n) => n.noteSharp === note || n.noteFlat === note
+    );
+    const root = noteEntry?.noteSharp ?? note; // fallback to input
+
     switch (type) {
       case "major":
-        return note;
+        return root;
       case "minor":
-        return `${note}m`;
+        return `${root}m`;
       case "7th":
-        return `${note}7`;
+        return `${root}7`;
       case "maj7":
-        return `${note}maj7`;
+        return `${root}maj7`;
       case "min7":
-        return `${note}m7`;
+        return `${root}m7`;
       case "dim":
-        return `${note}dim`;
+        return `${root}dim`;
       case "aug":
-        return `${note}aug`;
+        return `${root}aug`;
       default:
-        return note;
+        return root;
     }
-  };
-
-  const typeLabels = {
-    major: "Major",
-    minor: "Minor",
-    "7th": "7th",
-    maj7: "Maj7",
-    min7: "Min7",
-    dim: "Dim",
-    aug: "Aug",
   };
 
   return (
@@ -56,12 +53,12 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
               <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Note
               </th>
-              {CHORD_TYPES.map((type) => (
+              {Object.entries(CHORD_TYPES).map(([type, label]) => (
                 <th
                   key={type}
                   className="px-4 py-3 text-center text-sm font-medium text-muted-foreground"
                 >
-                  {typeLabels[type as keyof typeof typeLabels]}
+                  {label}
                 </th>
               ))}
             </tr>
@@ -75,7 +72,7 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
                   <td className="px-4 py-3 font-semibold text-foreground">
                     {noteLabel}
                   </td>
-                  {CHORD_TYPES.map((type) => {
+                  {Object.entries(CHORD_TYPES).map(([type]) => {
                     const chordId = getChordId(noteLabel, type);
                     const chord = CHORDS[chordId];
 
@@ -98,7 +95,7 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
                           className="chord-cell w-full px-3 py-2 text-sm transition-all duration-200"
                           data-testid={`chord-${chordId}`}
                         >
-                          {chord.name}
+                          {getNoteLabel(chord.name)}
                         </Button>
                       </td>
                     );

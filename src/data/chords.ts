@@ -8,7 +8,15 @@ export interface Chord {
   pianoKeys: number[]; // Positions starting at 0 for C. Wraps every 12 semitones (mod 12).
 }
 
-export const CHORD_TYPES = ["major", "minor", "7th", "maj7", "min7"];
+export const CHORD_TYPES: Record<string, string> = {
+  major: "Major",
+  minor: "Minor",
+  "7th": "7th",
+  maj7: "Maj7",
+  min7: "Min7",
+  // dim: "Dim",
+  // aug: "Aug",
+};
 
 const CHORD_FORMULAS: Record<
   string,

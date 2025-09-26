@@ -9,8 +9,6 @@ const App: React.FC = () => {
     setSelectedChord(chordId);
   };
 
-  // console.log(CHORDS);
-
   return (
     <NoteModeProvider>
       <div>
