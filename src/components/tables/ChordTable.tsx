@@ -48,13 +48,13 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
       <table className="w-full text-center table-fixed">
         <thead>
           <tr className="border-b border-border bg-muted/50">
-            <th className="px-4 py-3 text-sm font-medium text-muted-foreground first:border-r first:border-border">
+            <th className="py-3 text-sm font-medium text-muted-foreground first:border-r first:border-border">
               Note
             </th>
             {Object.entries(CHORD_TYPES).map(([type, label]) => (
               <th
                 key={type}
-                className="px-4 py-3 text-sm font-medium text-muted-foreground"
+                className="py-3 text-sm font-medium text-muted-foreground"
               >
                 {label}
               </th>
@@ -67,7 +67,7 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
 
             return (
               <tr key={idx}>
-                <td className="px-4 py-3 font-semibold text-foreground first:border-r first:border-border">
+                <td className="py-3 font-semibold text-foreground first:border-r first:border-border">
                   {noteLabel}
                 </td>
                 {Object.entries(CHORD_TYPES).map(([type]) => {

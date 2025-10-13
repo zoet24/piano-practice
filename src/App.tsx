@@ -12,7 +12,7 @@ const App: React.FC = () => {
 
   return (
     <NoteModeProvider>
-      <div className="p-4">
+      <div className="flex min-h-screen flex-col items-center justify-center p-4">
         <TabsTable />
         <ChordTable isTestMode={false} onChordClick={handleChordClick} />
         <ChordModal
