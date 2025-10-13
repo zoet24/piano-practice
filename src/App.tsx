@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChordModal } from "./components/modals/ChordModal";
 import { ChordTable } from "./components/tables/ChordTable";
+import { TabsTable } from "./components/tables/TabsTable";
 import { NoteModeProvider } from "./contexts/NoteModeContext";
 
 const App: React.FC = () => {
@@ -11,7 +12,8 @@ const App: React.FC = () => {
 
   return (
     <NoteModeProvider>
-      <div>
+      <div className="p-4">
+        <TabsTable />
         <ChordTable isTestMode={false} onChordClick={handleChordClick} />
         <ChordModal
           isOpen={!!selectedChord}

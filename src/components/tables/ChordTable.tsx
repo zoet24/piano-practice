@@ -44,69 +44,65 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
   };
 
   return (
-    <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border bg-muted/50">
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                Note
+    <div className="overflow-hidden rounded-md border border-border shadow">
+      <table className="w-full text-center table-fixed">
+        <thead>
+          <tr className="border-b border-border bg-muted/50">
+            <th className="px-4 py-3 text-sm font-medium text-muted-foreground first:border-r first:border-border">
+              Note
+            </th>
+            {Object.entries(CHORD_TYPES).map(([type, label]) => (
+              <th
+                key={type}
+                className="px-4 py-3 text-sm font-medium text-muted-foreground"
+              >
+                {label}
               </th>
-              {Object.entries(CHORD_TYPES).map(([type, label]) => (
-                <th
-                  key={type}
-                  className="px-4 py-3 text-center text-sm font-medium text-muted-foreground"
-                >
-                  {label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {notes.map((noteObj, idx) => {
-              const noteLabel = noteObj.note;
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {notes.map((noteObj, idx) => {
+            const noteLabel = noteObj.note;
 
-              return (
-                <tr key={idx}>
-                  <td className="px-4 py-3 font-semibold text-foreground">
-                    {noteLabel}
-                  </td>
-                  {Object.entries(CHORD_TYPES).map(([type]) => {
-                    const chordId = getChordId(noteLabel, type);
-                    const chord = CHORDS[chordId];
+            return (
+              <tr key={idx}>
+                <td className="px-4 py-3 font-semibold text-foreground first:border-r first:border-border">
+                  {noteLabel}
+                </td>
+                {Object.entries(CHORD_TYPES).map(([type]) => {
+                  const chordId = getChordId(noteLabel, type);
+                  const chord = CHORDS[chordId];
 
-                    console.log(chordId, chord);
-
-                    if (!chord) {
-                      return (
-                        <td key={type} className="px-2 py-2">
-                          <div className="w-full px-3 py-2 text-sm text-muted-foreground text-center">
-                            —
-                          </div>
-                        </td>
-                      );
-                    }
-
+                  if (!chord) {
                     return (
-                      <td key={type} className="px-2 py-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleCellClick(chordId)}
-                          className="chord-cell w-full px-3 py-2 text-sm transition-all duration-200"
-                          data-testid={`chord-${chordId}`}
-                        >
-                          {getNoteLabel(chord.name)}
-                        </Button>
+                      <td key={type} className="px-1 py-2">
+                        <div className="w-full px-3 py-2 text-sm text-muted-foreground text-center">
+                          —
+                        </div>
                       </td>
                     );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                  }
+
+                  return (
+                    <td key={type} className="px-1 py-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCellClick(chordId)}
+                        className="chord-cell w-full px-3 py-2 text-sm transition-all duration-200"
+                        data-testid={`chord-${chordId}`}
+                      >
+                        {getNoteLabel(chord.name)}
+                      </Button>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 };
