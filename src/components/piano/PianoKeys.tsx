@@ -40,7 +40,7 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
         if (keyAnnotations.some((a) => a.label.startsWith("LH"))) {
           keyClass = "bg-blue-500";
         } else if (keyAnnotations.some((a) => a.label.startsWith("RH"))) {
-          keyClass = "bg-red-500";
+          keyClass = "bg-teal-500";
         }
 
         // Outline for black keys with annotations
@@ -85,18 +85,21 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
               keyAnnotations.map((ann, idx) => (
                 <div
                   key={idx}
-                  className="absolute top-[50%] text-xs font-bold bg-white rounded-full w-5 h-5 flex items-center justify-center outline-2 z-20"
+                  className={`absolute top-[50%] text-xs font-bold bg-white rounded-full w-5 h-5 flex items-center justify-center outline-2 z-20 ${
+                    ann.label.startsWith("LH")
+                      ? "outline-blue-500"
+                      : "outline-teal-500"
+                  }`}
                   style={{
                     transform: "translate(0, -50%)",
-                    outlineColor: ann.label.startsWith("LH")
-                      ? "#3b82f6"
-                      : "#ef4444",
                   }}
                 >
                   <span
-                    style={{
-                      color: ann.label.startsWith("LH") ? "#3b82f6" : "#ef4444",
-                    }}
+                    className={`${
+                      ann.label.startsWith("LH")
+                        ? "text-blue-500"
+                        : "text-teal-500"
+                    }`}
                   >
                     {ann.label.slice(3)}
                   </span>

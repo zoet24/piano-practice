@@ -51,18 +51,13 @@ const mapChordKeysToAnnotations = (ch: Chord) => {
   return { lhAnnotations, rhAnnotations };
 };
 
-export const ChordModal = ({
-  isOpen,
-  onClose,
-  itemId,
-  type,
-}: ChordModalProps) => {
+export const ChordModal = ({ isOpen, onClose, itemId }: ChordModalProps) => {
   if (!itemId) return null;
 
   const rootChord: Chord = CHORDS[itemId];
   if (!rootChord) return null;
 
-  const [viewMode, setViewMode] = useState<ViewMode>("none");
+  const [viewMode, setViewMode] = useState<ViewMode>("all");
 
   const handleViewModeChange = () => {
     const modes: ViewMode[] = ["none", "annotations", "all", "notes"];

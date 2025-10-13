@@ -14,8 +14,8 @@ export const CHORD_TYPES: Record<string, string> = {
   "7th": "7th",
   maj7: "Maj7",
   min7: "Min7",
-  // dim: "Dim",
-  // aug: "Aug",
+  dim: "Dim",
+  aug: "Aug",
 };
 
 const CHORD_FORMULAS: Record<

@@ -44,17 +44,17 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
   };
 
   return (
-    <div className="overflow-hidden rounded-md border border-border shadow">
-      <table className="w-full text-center table-fixed">
+    <div className="w-full overflow-x-auto rounded-md border border-border shadow snap-x">
+      <table className="min-w-[600px] w-full text-center table-fixed">
         <thead>
-          <tr className="border-b border-border bg-muted/50">
-            <th className="py-3 text-sm font-medium text-muted-foreground first:border-r first:border-border">
+          <tr className="border-b border-border bg-muted">
+            <th className="py-3 text-sm font-medium text-muted-foreground first:border-r first:border-border sticky top-0 left-0 bg-muted z-20 flex justify-center">
               Note
             </th>
             {Object.entries(CHORD_TYPES).map(([type, label]) => (
               <th
                 key={type}
-                className="py-3 text-sm font-medium text-muted-foreground"
+                className="py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-muted z-10"
               >
                 {label}
               </th>
@@ -67,7 +67,7 @@ export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
 
             return (
               <tr key={idx}>
-                <td className="py-3 font-semibold text-foreground first:border-r first:border-border">
+                <td className="py-3 font-semibold text-foreground sticky left-0 bg-background border-r border-border z-10 flex justify-center">
                   {noteLabel}
                 </td>
                 {Object.entries(CHORD_TYPES).map(([type]) => {
