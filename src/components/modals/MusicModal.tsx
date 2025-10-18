@@ -12,7 +12,7 @@ import { PianoKeys } from "../piano/PianoKeys";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
-interface ChordModalProps {
+interface MusicModalProps {
   isOpen: boolean;
   onClose: () => void;
   itemId: string | null;
@@ -51,7 +51,7 @@ const mapChordKeysToAnnotations = (ch: Chord) => {
   return { lhAnnotations, rhAnnotations };
 };
 
-export const ChordModal = ({ isOpen, onClose, itemId }: ChordModalProps) => {
+export const MusicModal = ({ isOpen, onClose, itemId }: MusicModalProps) => {
   if (!itemId) return null;
 
   const rootChord: Chord = CHORDS[itemId];

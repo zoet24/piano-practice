@@ -1,5 +1,5 @@
 import { useNotes } from "../../data/notes";
-import type { KeyAnnotation, ViewMode } from "../modals/ChordModal";
+import type { KeyAnnotation, ViewMode } from "../modals/MusicModal";
 
 interface PianoKeysProps {
   annotations?: KeyAnnotation[];

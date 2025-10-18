@@ -2,12 +2,12 @@ import { Button } from "@/components/ui/button";
 import { CHORD_TYPES, CHORDS } from "@/data/chords";
 import { NOTES, useNoteLabel, useNotes } from "../../data/notes";
 
-interface ChordTableProps {
+interface MusicTableProps {
   isTestMode: boolean;
   onChordClick: (chordId: string) => void;
 }
 
-export const ChordTable = ({ isTestMode, onChordClick }: ChordTableProps) => {
+export const MusicTable = ({ isTestMode, onChordClick }: MusicTableProps) => {
   const notes = useNotes();
   const getNoteLabel = useNoteLabel();
 

@@ -1,4 +1,4 @@
-import { useNoteMode } from "../contexts/NoteModeContext";
+import { useControls } from "../contexts/ControlsContext";
 
 export interface Note {
   type: "white" | "black";
@@ -21,7 +21,7 @@ export const NOTES = [
 ] as const;
 
 export const useNoteLabel = () => {
-  const { mode } = useNoteMode();
+  const { noteMode } = useControls();
 
   const getNoteLabel = (chordName: string): string => {
     // Extract root note (first character + optional #)
@@ -37,7 +37,7 @@ export const useNoteLabel = () => {
     if (!noteObj) return chordName;
 
     const displayRoot =
-      mode === "notes-sharp" ? noteObj.noteSharp : noteObj.noteFlat;
+      noteMode === "notes-sharp" ? noteObj.noteSharp : noteObj.noteFlat;
     return displayRoot + suffix;
   };
 
@@ -45,10 +45,10 @@ export const useNoteLabel = () => {
 };
 
 export const useNotes = (): Note[] => {
-  const { mode } = useNoteMode();
+  const { noteMode } = useControls();
 
   return NOTES.map((key) => ({
     type: key.type,
-    note: mode === "notes-sharp" ? key.noteSharp : key.noteFlat,
+    note: noteMode === "notes-sharp" ? key.noteSharp : key.noteFlat,
   }));
 };

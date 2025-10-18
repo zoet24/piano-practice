@@ -1,20 +1,20 @@
-import { useNoteMode } from "../contexts/NoteModeContext";
+import { useControls } from "../contexts/ControlsContext";
 import type { Chord } from "../data/chords";
 import { NOTES } from "../data/notes";
 
 export const useChordNotes = (chord: Chord) => {
-  const { mode } = useNoteMode();
+  const { noteMode } = useControls();
 
   // Convert piano keys into visible notes
   const notes = chord.pianoKeys.map((keyIndex) => {
     const key = NOTES[keyIndex % 12];
-    return mode === "notes-sharp" ? key.noteSharp : key.noteFlat;
+    return noteMode === "notes-sharp" ? key.noteSharp : key.noteFlat;
   });
 
   // Root note determines chord name
   const rootKey = NOTES[chord.pianoKeys[0] % 12];
   const rootName =
-    mode === "notes-sharp" ? rootKey.noteSharp : rootKey.noteFlat;
+    noteMode === "notes-sharp" ? rootKey.noteSharp : rootKey.noteFlat;
 
   // Full chord name with context
   const fullName =
