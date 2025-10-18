@@ -5,24 +5,20 @@ import { MusicTable } from "./components/tables/MusicTable";
 import { ControlsProvider } from "./contexts/ControlsContext";
 
 const App: React.FC = () => {
-  const [selectedChord, setSelectedChord] = useState<string | null>(null);
-  const handleChordClick = (chordId: string) => {
-    setSelectedChord(chordId);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const handleItemClick = (itemId: string) => {
+    setSelectedItem(itemId);
   };
 
   return (
     <ControlsProvider>
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
         <Controls />
-        <MusicTable
-          isTestMode={false}
-          onChordClick={handleChordClick}
-          // types={viewMode === "chords" ? CHORD_TYPES : SCALE_TYPES}
-        />
+        <MusicTable isTestMode={false} onItemClick={handleItemClick} />
         <MusicModal
-          isOpen={!!selectedChord}
-          onClose={() => setSelectedChord(null)}
-          itemId={selectedChord}
+          isOpen={!!selectedItem}
+          onClose={() => setSelectedItem(null)}
+          itemId={selectedItem}
           type="chord"
         />
       </div>
