@@ -19,7 +19,6 @@ const App: React.FC = () => {
           isOpen={!!selectedItem}
           onClose={() => setSelectedItem(null)}
           itemId={selectedItem}
-          type="chord"
         />
       </div>
     </ControlsProvider>

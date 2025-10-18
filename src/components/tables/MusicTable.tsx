@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CHORD_TYPES, CHORDS } from "@/data/chords";
+import { useMemo } from "react";
 import { useControls } from "../../contexts/ControlsContext";
 import { NOTES, useNoteLabel, useNotes } from "../../data/notes";
 import { SCALE_TYPES } from "../../data/scales";
@@ -11,11 +12,14 @@ interface MusicTableProps {
 
 export const MusicTable = ({ isTestMode, onItemClick }: MusicTableProps) => {
   const { viewMode } = useControls();
-  const types = viewMode === "view-chords" ? CHORD_TYPES : SCALE_TYPES;
 
+  const types = useMemo(
+    () => (viewMode === "view-chords" ? CHORD_TYPES : SCALE_TYPES),
+    [viewMode]
+  );
   const notes = useNotes();
-  const getNoteLabel = useNoteLabel();
 
+  const getNoteLabel = useNoteLabel();
   const formatScaleLabel = (note: string, type: string): string => {
     const typeMap: Record<string, string> = {
       major: "major",
@@ -66,6 +70,43 @@ export const MusicTable = ({ isTestMode, onItemClick }: MusicTableProps) => {
     }
   };
 
+  const renderCell = (noteLabel: string, type: string) => {
+    const itemId = getItemId(noteLabel, type);
+
+    if (viewMode === "view-chords") {
+      const chord = CHORDS[itemId];
+      if (!chord) {
+        return (
+          <div className="w-full px-3 py-2 text-sm text-muted-foreground text-center">
+            —
+          </div>
+        );
+      }
+
+      return (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleItemClick(itemId)}
+          className="w-full px-3 py-2 text-sm transition-all duration-200"
+        >
+          {getNoteLabel(chord.name)}
+        </Button>
+      );
+    }
+
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handleItemClick(itemId)}
+        className="w-full px-3 py-2 text-sm transition-all duration-200"
+      >
+        {formatScaleLabel(noteLabel, type)}
+      </Button>
+    );
+  };
+
   return (
     <div className="w-full overflow-x-auto rounded-md border border-border shadow snap-x">
       <table className="min-w-[600px] w-full text-center table-fixed">
@@ -93,48 +134,11 @@ export const MusicTable = ({ isTestMode, onItemClick }: MusicTableProps) => {
                 <td className="py-3 font-semibold text-foreground sticky left-0 bg-background border-r border-border z-10">
                   {noteLabel}
                 </td>
-                {Object.entries(types).map(([type]) => {
-                  const itemId = getItemId(noteLabel, type);
-
-                  if (viewMode === "view-chords") {
-                    const chord = CHORDS[itemId];
-                    if (!chord) {
-                      return (
-                        <td key={type} className="px-1 py-2">
-                          <div className="w-full px-3 py-2 text-sm text-muted-foreground text-center">
-                            —
-                          </div>
-                        </td>
-                      );
-                    }
-
-                    return (
-                      <td key={type} className="px-1 py-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleItemClick(itemId)}
-                          className="w-full px-3 py-2 text-sm transition-all duration-200"
-                        >
-                          {getNoteLabel(chord.name)}
-                        </Button>
-                      </td>
-                    );
-                  } else {
-                    return (
-                      <td key={type} className="px-1 py-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleItemClick(itemId)}
-                          className="w-full px-3 py-2 text-sm transition-all duration-200"
-                        >
-                          {formatScaleLabel(noteLabel, type)}
-                        </Button>
-                      </td>
-                    );
-                  }
-                })}
+                {Object.entries(types).map(([type]) => (
+                  <td key={type} className="px-1 py-2">
+                    {renderCell(noteLabel, type)}
+                  </td>
+                ))}
               </tr>
             );
           })}
