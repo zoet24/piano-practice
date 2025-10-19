@@ -3,13 +3,6 @@ import { useControls } from "../../contexts/ControlsContext";
 import { ChordsModal } from "./ChordsModal";
 import { ScalesModal } from "./ScalesModal";
 
-export type ViewMode = "none" | "annotations" | "all" | "notes";
-
-export interface KeyAnnotation {
-  keyIndex: number;
-  label: string;
-}
-
 interface MusicModalProps {
   isOpen: boolean;
   onClose: () => void;

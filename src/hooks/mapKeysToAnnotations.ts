@@ -1,4 +1,4 @@
-import type { KeyAnnotation } from "../components/modals/MusicModal";
+import type { KeyAnnotation } from "../components/modals/useModel";
 import type { Chord } from "../data/chords";
 import type { Scale } from "../data/scales";
 
