@@ -17,13 +17,13 @@ export const MusicTable = ({ isTestMode, onItemClick }: MusicTableProps) => {
       <table className="min-w-[600px] w-full text-center table-fixed">
         <thead>
           <tr className="border-b border-border bg-muted">
-            <th className="py-3 text-sm font-medium text-muted-foreground sticky top-0 left-0 bg-muted z-20">
+            <th className="py-3 text-sm font-medium text-muted-foreground sticky top-0 left-0 bg-muted z-20 w-[80px]">
               Note
             </th>
             {Object.entries(types).map(([type, label]) => (
               <th
                 key={type}
-                className="py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-muted z-10"
+                className="py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-muted z-10 w-[100px]"
               >
                 {label}
               </th>
@@ -34,7 +34,7 @@ export const MusicTable = ({ isTestMode, onItemClick }: MusicTableProps) => {
         <tbody className="divide-y divide-border">
           {notes.map((noteObj, idx) => (
             <tr key={idx}>
-              <td className="py-3 font-semibold text-foreground sticky left-0 bg-background border-r border-border z-10">
+              <td className="py-3 font-semibold text-foreground sticky left-0 bg-background flex justify-center border-r border-border z-10">
                 {noteObj.note}
               </td>
 

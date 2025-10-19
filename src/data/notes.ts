@@ -3,6 +3,7 @@ import { useControls } from "../contexts/ControlsContext";
 export interface Note {
   type: "white" | "black";
   note: string;
+  audio: string;
 }
 
 export const NOTES = [
@@ -24,7 +25,6 @@ export const useNoteLabel = () => {
   const { noteMode } = useControls();
 
   const getNoteLabel = (chordName: string): string => {
-    // Extract root note (first character + optional #)
     const match = chordName.match(/^[A-G]#?/);
     if (!match) return chordName;
 
@@ -50,5 +50,6 @@ export const useNotes = (): Note[] => {
   return NOTES.map((key) => ({
     type: key.type,
     note: noteMode === "notes-sharp" ? key.noteSharp : key.noteFlat,
+    audio: key.noteFlat,
   }));
 };

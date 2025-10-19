@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useNotes } from "../../data/notes";
 import type { KeyAnnotation, ViewMode } from "../modals/useModel";
 
@@ -10,19 +11,41 @@ interface PianoKeysProps {
 
 export const PianoKeys: React.FC<PianoKeysProps> = ({
   annotations = [],
-  octaves = 2,
+  octaves = 3,
   viewMode = "none",
   onViewModeChange,
 }) => {
   const notes = useNotes();
+  const audioRefs = useRef<Record<string, HTMLAudioElement>>({});
 
   // Expand keys across N octaves
+  const startingOctave = 2; // first octave starts at A2
   const keys = Array.from({ length: octaves }, (_, octave) =>
-    notes.map((k, i) => ({
-      ...k,
-      keyIndex: i + octave * 12,
-    }))
+    notes.map((k, i) => {
+      const keyIndex = i + octave * 12;
+      const noteName = k.audio;
+      const octaveNum = startingOctave + octave;
+      const audioKey = `${noteName}${octaveNum}`;
+
+      // Preload audio
+      if (!audioRefs.current[audioKey]) {
+        audioRefs.current[audioKey] = new Audio(`/audio/piano/${audioKey}.mp3`);
+      }
+
+      return {
+        ...k,
+        keyIndex,
+        audio: audioRefs.current[audioKey],
+        octave: octaveNum,
+      };
+    })
   ).flat();
+
+  const playNote = (audio: HTMLAudioElement | undefined) => {
+    if (!audio) return;
+    audio.currentTime = 0;
+    audio.play();
+  };
 
   return (
     <div
@@ -69,6 +92,7 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
               ${keyClass}
             `}
             title={key.note}
+            onClick={() => playNote(key.audio)}
           >
             {/* Top notes (for black keys) */}
             {(viewMode === "notes" || viewMode === "all") &&
