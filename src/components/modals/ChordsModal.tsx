@@ -1,3 +1,4 @@
+import { useAudio } from "../../contexts/AudioContext";
 import { PianoKeys } from "../piano/PianoKeys";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { MusicHeader } from "./components/MusicHeader";
@@ -19,11 +20,14 @@ export const ChordsModal = ({ itemId }: { itemId: string }) => {
     // handleViewModeChange,
   } = model;
 
+  const { notesToPlay, playNotes } = useAudio();
+
   return (
     <>
       <MusicHeader
         title={getNoteLabel(selectedChord.fullName)}
         notes={selectedChordNotes}
+        onPlay={() => playNotes(notesToPlay, "chord")}
       />
       <Tabs
         defaultValue={rootChord.name}

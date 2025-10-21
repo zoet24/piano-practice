@@ -1,3 +1,4 @@
+import { useAudio } from "../../contexts/AudioContext";
 import { PianoKeys } from "../piano/PianoKeys";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { MusicHeader } from "./components/MusicHeader";
@@ -8,12 +9,14 @@ export const ScalesModal = ({ itemId }: { itemId: string }) => {
   if (!model) return null;
 
   const { rootScale, scaleNotes, getNoteLabel, handOptions } = model;
+  const { notesToPlay, playNotes } = useAudio();
 
   return (
     <>
       <MusicHeader
         title={rootScale.fullName}
         notes={scaleNotes.map(getNoteLabel)}
+        onPlay={() => playNotes(notesToPlay, "scale")}
       />
       <Tabs defaultValue="both">
         <TabsList className="flex w-full">

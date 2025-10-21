@@ -1,8 +1,7 @@
-import { Volume2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useAudio, type NoteSpec } from "../../contexts/AudioContext";
 import { useNotes } from "../../data/notes";
 import type { KeyAnnotation, ViewMode } from "../modals/useModel";
-import { Button } from "../ui/button";
 
 interface PianoKeysProps {
   annotations?: KeyAnnotation[];
@@ -17,25 +16,27 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
   octaves = 3,
   viewMode = "none",
   onViewModeChange,
-  type = "scale",
 }) => {
   const notes = useNotes();
+  const { setNotesToPlay } = useAudio();
   const [activeKeys, setActiveKeys] = useState<Set<number>>(new Set());
 
   // Expand keys across N octaves
-  const startingOctave = 2; // first octave starts at A2
-  const keys = Array.from({ length: octaves }, (_, octave) =>
-    notes.map((k, i) => {
-      const keyIndex = i + octave * 12;
-      const octaveNum = startingOctave + octave;
+  const keys = useMemo(() => {
+    const startingOctave = 2; // first octave starts at A2
+    return Array.from({ length: octaves }, (_, octave) =>
+      notes.map((k, i) => {
+        const keyIndex = i + octave * 12;
+        const octaveNum = startingOctave + octave;
 
-      return {
-        ...k,
-        keyIndex,
-        octave: octaveNum,
-      };
-    })
-  ).flat();
+        return {
+          ...k,
+          keyIndex,
+          octave: octaveNum,
+        };
+      })
+    ).flat();
+  }, [notes, octaves]);
 
   const handlePlayNote = (
     keyIndex: number,
@@ -58,41 +59,32 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
     });
   };
 
-  const handlePlayNotes = () => {
+  useEffect(() => {
     if (!annotations.length) return;
 
-    // Map annotation keyIndexes to key data (note name + octave)
     const notesToPlay = annotations
       .map((a) => {
         const key = keys.find((k) => k.keyIndex === a.keyIndex);
         if (!key) return null;
         return {
-          keyIndex: key.keyIndex,
-          audioNote: key.audioNote,
+          note: key.audioNote,
           octave: key.octave,
+          keyIndex: key.keyIndex,
         };
       })
-      .filter(
-        (n): n is { keyIndex: number; audioNote: string; octave: number } =>
-          n !== null
-      );
+      .filter(Boolean) as NoteSpec[];
 
-    if (type === "scale") {
-      // 🎵 Sequential playback
-      notesToPlay.forEach((n, i) => {
-        setTimeout(() => {
-          handlePlayNote(n.keyIndex, n.audioNote, n.octave);
-        }, i * 250); // 250ms gap between notes (adjust tempo)
-      });
-    } else {
-      // 🎶 Chord playback — all notes together
-      notesToPlay.forEach((n) => {
-        handlePlayNote(n.keyIndex, n.audioNote, n.octave);
-      });
-    }
-  };
-
-  console.log(annotations);
+    setNotesToPlay((prev) => {
+      const isEqual =
+        prev.length === notesToPlay.length &&
+        prev.every(
+          (n, i) =>
+            n.note === notesToPlay[i].note && n.octave === notesToPlay[i].octave
+        );
+      if (isEqual) return prev; // prevents rerender loop
+      return notesToPlay;
+    });
+  }, [annotations, keys, setNotesToPlay]);
 
   return (
     <div
@@ -100,14 +92,6 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
       data-testid="piano-keys"
       onClick={onViewModeChange}
     >
-      <Button
-        size="icon"
-        variant="ghost"
-        onClick={handlePlayNotes}
-        aria-label="Play chord"
-      >
-        <Volume2 className="h-5 w-5" />
-      </Button>
       {keys.map((key) => {
         const keyAnnotations = annotations.filter(
           (a) => a.keyIndex === key.keyIndex

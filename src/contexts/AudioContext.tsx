@@ -1,15 +1,15 @@
-import React, { createContext, useContext, useRef } from "react";
+import React, { createContext, useContext, useRef, useState } from "react";
 
-export type PlaySpec = {
+export type NoteSpec = {
   note: string;
   octave: number;
+  keyIndex?: number;
 };
 
 export type AudioContextValue = {
-  playNote: (spec: PlaySpec) => void;
-  playChord: (specs: PlaySpec[]) => void;
-  playScale: (specs: PlaySpec[], delayMs?: number) => Promise<void>;
-  preload: (specs: PlaySpec[]) => void;
+  notesToPlay: NoteSpec[];
+  setNotesToPlay: React.Dispatch<React.SetStateAction<NoteSpec[]>>;
+  playNotes: (notes: NoteSpec[], type: "chord" | "scale") => void;
 };
 
 const AudioCtx = createContext<AudioContextValue | undefined>(undefined);
@@ -18,6 +18,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const cache = useRef<Record<string, HTMLAudioElement>>({});
+  const [notesToPlay, setNotesToPlay] = useState<NoteSpec[]>([]);
 
   const getAudio = (note: string, octave: number) => {
     const key = `${note}${octave}`;
@@ -27,40 +28,23 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     return cache.current[key];
   };
 
-  const playNote = ({ note, octave }: PlaySpec) => {
-    try {
-      const base = getAudio(note, octave);
-      const audio = base.cloneNode(true) as HTMLAudioElement;
-      audio.currentTime = 0;
-      audio.play().catch((e) => console.warn("Audio play failed", e));
-    } catch (err) {
-      console.error("Error playing note:", err);
+  const playNote = (spec: NoteSpec) => {
+    const audio = getAudio(spec.note, spec.octave);
+    const clone = audio.cloneNode(true) as HTMLAudioElement;
+    clone.currentTime = 0;
+    clone.play().catch((err) => console.warn("Audio play failed:", err));
+  };
+
+  const playNotes = (specs: NoteSpec[], type: "chord" | "scale") => {
+    if (type === "chord") {
+      specs.forEach(playNote);
+    } else {
+      specs.forEach((n, i) => setTimeout(() => playNote(n), i * 250));
     }
-  };
-
-  const playChord = (specs: PlaySpec[]) => {
-    specs.forEach(playNote);
-  };
-
-  const playScale = async (specs: PlaySpec[], delayMs = 250) => {
-    for (const spec of specs) {
-      playNote(spec);
-      await new Promise((res) => setTimeout(res, delayMs));
-    }
-  };
-
-  const preload = (specs: PlaySpec[]) => {
-    specs.forEach((s) => {
-      try {
-        getAudio(s.note, s.octave);
-      } catch {
-        /* ignore */
-      }
-    });
   };
 
   return (
-    <AudioCtx.Provider value={{ playNote, playChord, playScale, preload }}>
+    <AudioCtx.Provider value={{ notesToPlay, setNotesToPlay, playNotes }}>
       {children}
     </AudioCtx.Provider>
   );
