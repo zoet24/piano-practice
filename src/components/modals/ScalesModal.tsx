@@ -14,7 +14,7 @@ export const ScalesModal = ({ itemId }: { itemId: string }) => {
   return (
     <>
       <MusicHeader
-        title={rootScale.fullName}
+        title={getNoteLabel(rootScale.fullName)}
         notes={scaleNotes.map(getNoteLabel)}
         onPlay={() => playNotes(notesToPlay, "scale")}
       />
