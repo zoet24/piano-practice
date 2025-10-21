@@ -1,4 +1,4 @@
-import { useAudio } from "../../contexts/AudioContext";
+import { useState } from "react";
 import { useNotes } from "../../data/notes";
 import type { KeyAnnotation, ViewMode } from "../modals/useModel";
 
@@ -16,7 +16,7 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
   onViewModeChange,
 }) => {
   const notes = useNotes();
-  const { playKey, activeKeys } = useAudio();
+  const [activeKeys, setActiveKeys] = useState<Set<number>>(new Set());
 
   // Expand keys across N octaves
   const startingOctave = 2; // first octave starts at A2
@@ -33,8 +33,27 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
     })
   ).flat();
 
-  const playNote = (keyIndex: number, note: string, octave: number) => {
-    playKey({ note, octave, keyIndex });
+  console.log(keys);
+
+  const handlePlayNote = (
+    keyIndex: number,
+    audioNote: string,
+    octave: number
+  ) => {
+    const audio = new Audio(`/audio/piano/${audioNote}${octave}.mp3`);
+
+    setActiveKeys((prev) => new Set(prev).add(keyIndex));
+
+    audio.currentTime = 0;
+    audio.play().catch((err) => console.warn("Audio play failed:", err));
+
+    audio.addEventListener("ended", () => {
+      setActiveKeys((prev) => {
+        const next = new Set(prev);
+        next.delete(keyIndex);
+        return next;
+      });
+    });
   };
 
   return (
@@ -89,7 +108,9 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
               ${keyClass}
             `}
             title={key.note}
-            onClick={() => playNote(key.keyIndex, key.audio, key.octave)}
+            onClick={() =>
+              handlePlayNote(key.keyIndex, key.audioNote, key.octave)
+            }
           >
             {/* Top notes (for black keys) */}
             {(viewMode === "notes" || viewMode === "all") &&

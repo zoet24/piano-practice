@@ -3,7 +3,7 @@ import { useControls } from "../contexts/ControlsContext";
 export interface Note {
   type: "white" | "black";
   note: string;
-  audio: string;
+  audioNote: string;
 }
 
 export const NOTES = [
@@ -50,6 +50,6 @@ export const useNotes = (): Note[] => {
   return NOTES.map((key) => ({
     type: key.type,
     note: noteMode === "notes-sharp" ? key.noteSharp : key.noteFlat,
-    audio: key.noteFlat,
+    audioNote: key.noteFlat,
   }));
 };
