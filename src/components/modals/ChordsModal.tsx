@@ -15,15 +15,30 @@ export const ChordsModal = ({ itemId }: { itemId: string }) => {
     selectedChordNotes,
     getNoteLabel,
     handOptions,
-    viewMode,
-    handleViewModeChange,
+    // viewMode,
+    // handleViewModeChange,
   } = model;
+
+  const handlePlay = () => {
+    console.log("handlePlay");
+    selectedChordNotes.forEach((note, index) => {
+      console.log(note, index);
+
+      const audio = new Audio(`/audio/${note}.mp3`);
+      console.log(`/audio/${note}.mp3`);
+
+      // small delay between notes for scales, or all at once for chords
+      audio.playbackRate = 1.0;
+      setTimeout(() => audio.play(), index * 120); // tweak delay as needed
+    });
+  };
 
   return (
     <>
       <MusicHeader
         title={getNoteLabel(selectedChord.fullName)}
         notes={selectedChordNotes}
+        onPlay={handlePlay}
       />
       <Tabs
         defaultValue={rootChord.name}
@@ -56,8 +71,9 @@ export const ChordsModal = ({ itemId }: { itemId: string }) => {
                     <PianoKeys
                       annotations={hand.getAnnotations()}
                       octaves={3}
-                      viewMode={viewMode}
-                      onViewModeChange={handleViewModeChange}
+                      viewMode="all"
+                      // viewMode={viewMode}
+                      // onViewModeChange={handleViewModeChange}
                     />
                   </TabsContent>
                 ))}

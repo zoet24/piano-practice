@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useAudio } from "../../contexts/AudioContext";
 import { useNotes } from "../../data/notes";
 import type { KeyAnnotation, ViewMode } from "../modals/useModel";
 
@@ -16,35 +16,25 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
   onViewModeChange,
 }) => {
   const notes = useNotes();
-  const audioRefs = useRef<Record<string, HTMLAudioElement>>({});
+  const { playKey, activeKeys } = useAudio();
 
   // Expand keys across N octaves
   const startingOctave = 2; // first octave starts at A2
   const keys = Array.from({ length: octaves }, (_, octave) =>
     notes.map((k, i) => {
       const keyIndex = i + octave * 12;
-      const noteName = k.audio;
       const octaveNum = startingOctave + octave;
-      const audioKey = `${noteName}${octaveNum}`;
-
-      // Preload audio
-      if (!audioRefs.current[audioKey]) {
-        audioRefs.current[audioKey] = new Audio(`/audio/piano/${audioKey}.mp3`);
-      }
 
       return {
         ...k,
         keyIndex,
-        audio: audioRefs.current[audioKey],
         octave: octaveNum,
       };
     })
   ).flat();
 
-  const playNote = (audio: HTMLAudioElement | undefined) => {
-    if (!audio) return;
-    audio.currentTime = 0;
-    audio.play();
+  const playNote = (keyIndex: number, note: string, octave: number) => {
+    playKey({ note, octave, keyIndex });
   };
 
   return (
@@ -66,8 +56,15 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
           keyClass = "bg-teal-500";
         }
 
+        if (activeKeys.has(key.keyIndex)) {
+          keyClass = "bg-blue-300";
+        }
+
         // Outline for black keys with annotations
-        if (key.type === "black" && keyAnnotations.length > 0) {
+        if (
+          key.type === "black" &&
+          (keyAnnotations.length > 0 || activeKeys.has(key.keyIndex))
+        ) {
           keyClass += " outline outline-black";
         }
 
@@ -92,7 +89,7 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
               ${keyClass}
             `}
             title={key.note}
-            onClick={() => playNote(key.audio)}
+            onClick={() => playNote(key.keyIndex, key.audio, key.octave)}
           >
             {/* Top notes (for black keys) */}
             {(viewMode === "notes" || viewMode === "all") &&
