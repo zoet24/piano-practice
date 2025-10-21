@@ -1,12 +1,15 @@
+import { Volume2 } from "lucide-react";
 import { useState } from "react";
 import { useNotes } from "../../data/notes";
 import type { KeyAnnotation, ViewMode } from "../modals/useModel";
+import { Button } from "../ui/button";
 
 interface PianoKeysProps {
   annotations?: KeyAnnotation[];
   octaves?: number;
   viewMode?: ViewMode;
   onViewModeChange?: () => void;
+  type?: "chord" | "scale";
 }
 
 export const PianoKeys: React.FC<PianoKeysProps> = ({
@@ -14,6 +17,7 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
   octaves = 3,
   viewMode = "none",
   onViewModeChange,
+  type = "scale",
 }) => {
   const notes = useNotes();
   const [activeKeys, setActiveKeys] = useState<Set<number>>(new Set());
@@ -32,8 +36,6 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
       };
     })
   ).flat();
-
-  console.log(keys);
 
   const handlePlayNote = (
     keyIndex: number,
@@ -56,12 +58,56 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
     });
   };
 
+  const handlePlayNotes = () => {
+    if (!annotations.length) return;
+
+    // Map annotation keyIndexes to key data (note name + octave)
+    const notesToPlay = annotations
+      .map((a) => {
+        const key = keys.find((k) => k.keyIndex === a.keyIndex);
+        if (!key) return null;
+        return {
+          keyIndex: key.keyIndex,
+          audioNote: key.audioNote,
+          octave: key.octave,
+        };
+      })
+      .filter(
+        (n): n is { keyIndex: number; audioNote: string; octave: number } =>
+          n !== null
+      );
+
+    if (type === "scale") {
+      // 🎵 Sequential playback
+      notesToPlay.forEach((n, i) => {
+        setTimeout(() => {
+          handlePlayNote(n.keyIndex, n.audioNote, n.octave);
+        }, i * 250); // 250ms gap between notes (adjust tempo)
+      });
+    } else {
+      // 🎶 Chord playback — all notes together
+      notesToPlay.forEach((n) => {
+        handlePlayNote(n.keyIndex, n.audioNote, n.octave);
+      });
+    }
+  };
+
+  console.log(annotations);
+
   return (
     <div
       className="relative flex cursor-pointer py-4"
       data-testid="piano-keys"
       onClick={onViewModeChange}
     >
+      <Button
+        size="icon"
+        variant="ghost"
+        onClick={handlePlayNotes}
+        aria-label="Play chord"
+      >
+        <Volume2 className="h-5 w-5" />
+      </Button>
       {keys.map((key) => {
         const keyAnnotations = annotations.filter(
           (a) => a.keyIndex === key.keyIndex
