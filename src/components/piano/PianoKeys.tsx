@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useAudio, type NoteSpec } from "../../contexts/AudioContext";
 import { useNotes } from "../../data/notes";
 import type { KeyAnnotation, ViewMode } from "../modals/useModel";
@@ -18,8 +18,7 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
   onViewModeChange,
 }) => {
   const notes = useNotes();
-  const { setNotesToPlay } = useAudio();
-  const [activeKeys, setActiveKeys] = useState<Set<number>>(new Set());
+  const { setNotesToPlay, playNotes, activeKeys } = useAudio();
 
   // Expand keys across N octaves
   const keys = useMemo(() => {
@@ -38,25 +37,8 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
     ).flat();
   }, [notes, octaves]);
 
-  const handlePlayNote = (
-    keyIndex: number,
-    audioNote: string,
-    octave: number
-  ) => {
-    const audio = new Audio(`/audio/piano/${audioNote}${octave}.mp3`);
-
-    setActiveKeys((prev) => new Set(prev).add(keyIndex));
-
-    audio.currentTime = 0;
-    audio.play().catch((err) => console.warn("Audio play failed:", err));
-
-    audio.addEventListener("ended", () => {
-      setActiveKeys((prev) => {
-        const next = new Set(prev);
-        next.delete(keyIndex);
-        return next;
-      });
-    });
+  const handlePlayNote = (key: NoteSpec) => {
+    playNotes([key], "chord");
   };
 
   useEffect(() => {
@@ -81,8 +63,7 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
           (n, i) =>
             n.note === notesToPlay[i].note && n.octave === notesToPlay[i].octave
         );
-      if (isEqual) return prev; // prevents rerender loop
-      return notesToPlay;
+      return isEqual ? prev : notesToPlay;
     });
   }, [annotations, keys, setNotesToPlay]);
 
@@ -139,7 +120,11 @@ export const PianoKeys: React.FC<PianoKeysProps> = ({
             `}
             title={key.note}
             onClick={() =>
-              handlePlayNote(key.keyIndex, key.audioNote, key.octave)
+              handlePlayNote({
+                note: key.audioNote,
+                octave: key.octave,
+                keyIndex: key.keyIndex,
+              })
             }
           >
             {/* Top notes (for black keys) */}
