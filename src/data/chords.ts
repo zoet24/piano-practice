@@ -16,6 +16,8 @@ export const CHORD_TYPES: Record<string, string> = {
   min7: "Min7",
   dim: "Dim",
   aug: "Aug",
+  sus2: "Sus2",
+  sus4: "Sus4",
 };
 
 const CHORD_FORMULAS: Record<
@@ -29,6 +31,8 @@ const CHORD_FORMULAS: Record<
   min7: { fullName: "Minor 7th", intervals: [0, 3, 7, 10] },
   dim: { fullName: "Diminished", intervals: [0, 3, 6] },
   aug: { fullName: "Augmented", intervals: [0, 4, 8] },
+  sus2: { fullName: "Suspended 2nd", intervals: [0, 2, 7] },
+  sus4: { fullName: "Suspended 4th", intervals: [0, 5, 7] },
 };
 
 const generateAllChords = (): Record<string, Chord> => {

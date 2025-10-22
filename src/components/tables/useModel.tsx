@@ -58,6 +58,10 @@ export const useMusicTableModel = (
           return `${root}dim`;
         case "aug":
           return `${root}aug`;
+        case "sus2":
+          return `${root}sus2`;
+        case "sus4":
+          return `${root}sus4`;
         default:
           return root;
       }
