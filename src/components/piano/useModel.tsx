@@ -68,11 +68,11 @@ export const usePianoKeys = ({
 
     let keyClass = "";
     if (keyAnnotations.some((a) => a.label.startsWith("LH")))
-      keyClass = "bg-blue-500";
+      keyClass = "bg-keys-left";
     else if (keyAnnotations.some((a) => a.label.startsWith("RH")))
-      keyClass = "bg-teal-500";
+      keyClass = "bg-keys-right";
 
-    if (activeKeys.has(keyIndex)) keyClass = "bg-blue-300";
+    if (activeKeys.has(keyIndex)) keyClass = "bg-keys-active";
 
     if (
       type === "black" &&
