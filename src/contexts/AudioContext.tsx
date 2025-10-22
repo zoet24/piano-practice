@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { NOTES } from "../data/notes";
 
 export type NoteSpec = {
   note: string;
@@ -12,6 +19,7 @@ export type AudioContextValue = {
   activeKeys: Set<number>;
   setActiveKeys: React.Dispatch<React.SetStateAction<Set<number>>>;
   playNotes: (notes: NoteSpec[], type: "chord" | "scale") => void;
+  isAudioReady: boolean;
 };
 
 const AudioCtx = createContext<AudioContextValue | undefined>(undefined);
@@ -22,16 +30,43 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   const cache = useRef<Record<string, HTMLAudioElement>>({});
   const [notesToPlay, setNotesToPlay] = useState<NoteSpec[]>([]);
   const [activeKeys, setActiveKeys] = useState<Set<number>>(new Set());
+  const [isAudioReady, setIsAudioReady] = useState(false);
+
+  useEffect(() => {
+    const octaves = [2, 3, 4];
+    const total = NOTES.length * octaves.length;
+    let loaded = 0;
+
+    NOTES.forEach((note) => {
+      octaves.forEach((octave) => {
+        const key = `${note.noteFlat}${octave}`;
+        const audio = new Audio(`/audio/piano/${key}.mp3`);
+        audio.preload = "auto";
+
+        audio.addEventListener(
+          "canplaythrough",
+          () => {
+            loaded++;
+            if (loaded === total) {
+              setIsAudioReady(true);
+            }
+          },
+          { once: true }
+        );
+
+        cache.current[key] = audio;
+      });
+    });
+  }, []);
 
   const getAudio = (note: string, octave: number) => {
     const key = `${note}${octave}`;
-    if (!cache.current[key]) {
-      cache.current[key] = new Audio(`/audio/piano/${key}.mp3`);
-    }
     return cache.current[key];
   };
 
   const playNotes = (specs: NoteSpec[], type: "chord" | "scale") => {
+    if (!isAudioReady) return;
+
     specs.forEach((spec, i) => {
       const playSingleNote = () => {
         if (spec.keyIndex === undefined) return;
@@ -75,6 +110,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
         activeKeys,
         setActiveKeys,
         playNotes,
+        isAudioReady,
       }}
     >
       {children}
