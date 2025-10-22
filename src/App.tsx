@@ -15,15 +15,17 @@ const App: React.FC = () => {
   return (
     <AudioProvider>
       <ControlsProvider>
-        <div className="flex min-h-screen flex-col items-center justify-center p-4">
+        <div className="relative min-h-screen flex flex-col justify-center">
           <WavyBackground />
-          <Controls />
-          <MusicTable isTestMode={false} onItemClick={handleItemClick} />
-          <MusicModal
-            isOpen={!!selectedItem}
-            onClose={() => setSelectedItem(null)}
-            itemId={selectedItem}
-          />
+          <div className="relative flex flex-col items-center justify-center p-4">
+            <Controls />
+            <MusicTable isTestMode={false} onItemClick={handleItemClick} />
+            <MusicModal
+              isOpen={!!selectedItem}
+              onClose={() => setSelectedItem(null)}
+              itemId={selectedItem}
+            />
+          </div>
         </div>
       </ControlsProvider>
     </AudioProvider>
