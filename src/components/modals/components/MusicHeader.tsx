@@ -13,11 +13,30 @@ interface MusicHeaderProps {
 export const MusicHeader = ({ title, notes, onPlay }: MusicHeaderProps) => {
   const { isAudioReady } = useAudio();
 
+  const Badges = () => {
+    return (
+      <>
+        {notes.map((note, i) => (
+          <Badge
+            key={i}
+            variant="default"
+            className="px-3 py-1 text-sm font-medium"
+          >
+            {note}
+          </Badge>
+        ))}
+      </>
+    );
+  };
+
   return (
     <DialogHeader>
       <div className="flex flex-col items-center gap-2">
         <div className="flex items-center gap-2">
           <DialogTitle className="text-2xl font-bold">{title}</DialogTitle>
+          <div className="flex gap-1 show-mobile-landscape">
+            <Badges />
+          </div>
           {onPlay && (
             <Button
               size="icon"
@@ -30,16 +49,8 @@ export const MusicHeader = ({ title, notes, onPlay }: MusicHeaderProps) => {
             </Button>
           )}
         </div>
-        <div className="flex gap-2 flex-wrap justify-center">
-          {notes.map((note, i) => (
-            <Badge
-              key={i}
-              variant="default"
-              className="px-3 py-1 text-sm font-medium"
-            >
-              {note}
-            </Badge>
-          ))}
+        <div className="flex gap-2 flex-wrap justify-center hide-on-mobile-landscape">
+          <Badges />
         </div>
       </div>
     </DialogHeader>

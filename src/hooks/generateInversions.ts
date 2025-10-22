@@ -32,7 +32,7 @@ export const generateInversions = (
     const rotatedNotes = normalizedKeys.map((k) => notes[k % 12].note);
 
     const inversionName = `${chord.name}/${rotatedNotes[0]}`;
-    const inversionFullName = `${chord.fullName} ${ordinal(i)} Inversion`;
+    const inversionFullName = `${chord.fullName} ${ordinal(i)} Inv`;
 
     inversions.push({
       ...chord,

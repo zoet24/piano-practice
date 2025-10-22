@@ -148,3 +148,15 @@
     border-radius: 0 0 2px 2px;
   }
 }
+
+@media (orientation: landscape) and (max-width: 768px) {
+  .hide-on-mobile-landscape {
+    display: none !important;
+  }
+}
+
+@media (orientation: portrait), (min-width: 769px) {
+  .show-mobile-landscape {
+    display: none !important;
+  }
+}
