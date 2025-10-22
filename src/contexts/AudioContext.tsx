@@ -72,11 +72,15 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
         if (spec.keyIndex === undefined) return;
 
         // Add key to active keys
-        setActiveKeys((prev) => {
-          const next = new Set(prev);
-          next.add(spec.keyIndex!);
-          return next;
-        });
+        if (type === "scale") {
+          setActiveKeys(new Set([spec.keyIndex]));
+        } else {
+          setActiveKeys((prev) => {
+            const next = new Set(prev);
+            next.add(spec.keyIndex!);
+            return next;
+          });
+        }
 
         const audio = getAudio(spec.note, spec.octave);
         const clone = audio.cloneNode(true) as HTMLAudioElement;
