@@ -15,9 +15,9 @@ const App: React.FC = () => {
   return (
     <AudioProvider>
       <ControlsProvider>
-        <div className="relative min-h-screen flex flex-col justify-center">
+        <div className="relative flex flex-col justify-center">
           <WavyBackground />
-          <div className="relative flex flex-col items-center justify-center p-4">
+          <div className="relative h-screen flex flex-col items-center justify-center p-4">
             <Controls />
             <MusicTable isTestMode={false} onItemClick={handleItemClick} />
             <MusicModal
