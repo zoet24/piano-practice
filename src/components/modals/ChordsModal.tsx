@@ -1,10 +1,14 @@
 import { useAudio } from "../../contexts/AudioContext";
+import { useProgress } from "../../contexts/useProgress";
+import { getChordPracticeId } from "../../data/practiceItems";
+import { ConfidenceIndicator } from "../practice/ConfidenceIndicator";
 import { PianoKeys } from "../piano/PianoKeys";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { MusicHeader } from "./components/MusicHeader";
 import { useChordModel } from "./useModel";
 
 export const ChordsModal = ({ itemId }: { itemId: string }) => {
+  const { getConfidence } = useProgress();
   const model = useChordModel(itemId);
   if (!model) return null;
 
@@ -22,12 +26,21 @@ export const ChordsModal = ({ itemId }: { itemId: string }) => {
 
   const { notesToPlay, playNotes } = useAudio();
 
+  // allChords is [root, 1st inversion, 2nd inversion, ...]
+  const getInversionConfidence = (index: number) =>
+    getConfidence(getChordPracticeId(rootChord.name, index));
+  const selectedIndex = Math.max(
+    0,
+    allChords.findIndex((ch) => ch.name === selectedChord.name)
+  );
+
   return (
     <>
       <MusicHeader
         title={getNoteLabel(selectedChord.fullName)}
         notes={selectedChordNotes}
         onPlay={() => playNotes(notesToPlay, "chord")}
+        confidence={getInversionConfidence(selectedIndex)}
       />
       <Tabs
         defaultValue={rootChord.name}
@@ -35,9 +48,10 @@ export const ChordsModal = ({ itemId }: { itemId: string }) => {
       >
         <div className="flex">
           <TabsList className="w-full">
-            {allChords.map((ch) => (
-              <TabsTrigger key={ch.name} value={ch.name}>
+            {allChords.map((ch, i) => (
+              <TabsTrigger key={ch.name} value={ch.name} className="gap-1.5">
                 {getNoteLabel(ch.name)}
+                <ConfidenceIndicator confidence={getInversionConfidence(i)} />
               </TabsTrigger>
             ))}
           </TabsList>

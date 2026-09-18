@@ -20,6 +20,20 @@ export const CHORD_TYPES: Record<string, string> = {
   sus4: "Sus4",
 };
 
+// maps a CHORD_TYPES key and a sharp root (e.g. "C#") to its CHORDS key
+export const getChordId = (root: string, type: string): string => {
+  switch (type) {
+    case "major":
+      return root;
+    case "minor":
+      return `${root}m`;
+    case "7th":
+      return `${root}7`;
+    default:
+      return `${root}${type}`;
+  }
+};
+
 const CHORD_FORMULAS: Record<
   string,
   { fullName: string; intervals: number[] }

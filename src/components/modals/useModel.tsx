@@ -15,7 +15,7 @@ export interface KeyAnnotation {
   label: string;
 }
 
-const createHandOptions = (
+export const createHandOptions = (
   lhAnnotations: KeyAnnotation[],
   rhAnnotations: KeyAnnotation[]
 ) => {

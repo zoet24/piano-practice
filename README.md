@@ -17,9 +17,22 @@ It lets users visualise notes on a piano, switch between sharps and flats, and e
 
 - Clone the repo: `git clone https://github.com/your-username/piano-trainer.git`
 - Cd into the root folder: `cd piano-practice`
+- Use Node.js 22 (`nvm use` picks it up from `.nvmrc`)
 - Install dependencies: `npm install`
 - Run the dev server: `npm run dev`
 - Then open http://localhost:5173 in your browser
+- Run the unit tests: `npm test`
+
+## 🎓 Practice mode
+
+Click **Practice** to test yourself with flashcards.
+
+- **Set up a test:** choose chords, scales or both (optionally with inversions), then pick items yourself, at random, or least confident first. You can also limit it to items at or below a confidence level. Choose whether cards show the name or the notes, which hands to use, and a number of cards or a time limit.
+- **Flashcards:** answer **Yes / Unsure / No** (keys `1` `2` `3`) to reveal the answer and hear it. Change your answer if needed, then press **Next**, `→` or swipe left. `R` replays the sound.
+- **Confidence:** every chord, inversion and scale has a score from 0 to 3. Yes adds 1, Unsure keeps it the same, and No takes 1 away. Scores are shown as dots in the table and chord/scale popups, and are saved when a test ends.
+- **Your progress** is stored in this browser's localStorage. Use **Export** / **Import** on the setup screen to back it up or move it to another device.
+
+The logic lives in `src/lib/progress.ts` (scoring and storage), `src/lib/practiceDeck.ts` (building the card deck) and `src/data/practiceItems.ts` (stable ids for every chord, inversion and scale). The screens are in `src/components/practice/`.
 
 ## 🎶 Add a new chord
 
@@ -32,10 +45,6 @@ It lets users visualise notes on a piano, switch between sharps and flats, and e
 - Your scale now exists, but you need to display it in the MusicTable.tsx component. Go to src/components/tables/useModel.tsx and add your new scale type to the type map in the `formatScaleLabel` function.
 
 ## 🧠 Future Ideas
-
-### 🎯 Testing Mode
-
-Practice recognising chords and scales by name, ear or visual pattern — with timed quizzes and performance tracking.
 
 ### 🎵 Songwriting Mode
 

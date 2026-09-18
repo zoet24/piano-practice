@@ -1,14 +1,26 @@
 import { useMemo } from "react";
 import { useControls } from "../../contexts/ControlsContext";
-import { CHORD_TYPES, CHORDS } from "../../data/chords";
+import { useProgress } from "../../contexts/useProgress";
+import { CHORD_TYPES, CHORDS, getChordId } from "../../data/chords";
 import { NOTES, useNoteLabel, useNotes } from "../../data/notes";
+import {
+  getChordPracticeId,
+  getScalePracticeId,
+} from "../../data/practiceItems";
 import { SCALE_TYPES } from "../../data/scales";
 
+export interface TableSelection {
+  selectedIds: Set<string>;
+  // toggles a group of practice ids: selects all of them unless all are already selected
+  onToggle: (practiceIds: string[]) => void;
+}
+
 export const useMusicTableModel = (
-  isTestMode: boolean,
-  onItemClick: (itemId: string) => void
+  onItemClick: (itemId: string) => void,
+  selection?: TableSelection
 ) => {
   const { viewMode } = useControls();
+  const { getConfidence } = useProgress();
   const notes = useNotes();
   const getNoteLabel = useNoteLabel();
 
@@ -16,10 +28,6 @@ export const useMusicTableModel = (
     () => (viewMode === "view-chords" ? CHORD_TYPES : SCALE_TYPES),
     [viewMode]
   );
-
-  const handleItemClick = (itemId: string) => {
-    if (!isTestMode) onItemClick(itemId);
-  };
 
   const formatScaleLabel = (note: string, type: string): string => {
     const typeMap: Record<string, string> = {
@@ -40,32 +48,9 @@ export const useMusicTableModel = (
     );
     const root = noteEntry?.noteSharp ?? note;
 
-    if (viewMode === "view-scales") {
-      return `${root}-${type}`;
-    } else {
-      switch (type) {
-        case "major":
-          return root;
-        case "minor":
-          return `${root}m`;
-        case "7th":
-          return `${root}7`;
-        case "maj7":
-          return `${root}maj7`;
-        case "min7":
-          return `${root}min7`;
-        case "dim":
-          return `${root}dim`;
-        case "aug":
-          return `${root}aug`;
-        case "sus2":
-          return `${root}sus2`;
-        case "sus4":
-          return `${root}sus4`;
-        default:
-          return root;
-      }
-    }
+    return viewMode === "view-scales"
+      ? `${root}-${type}`
+      : getChordId(root, type);
   };
 
   const getCellData = (noteLabel: string, type: string) => {
@@ -73,17 +58,57 @@ export const useMusicTableModel = (
 
     if (viewMode === "view-chords") {
       const chord = CHORDS[itemId];
+      const practiceId = getChordPracticeId(itemId);
       return chord
-        ? { id: itemId, label: getNoteLabel(chord.name), exists: true }
-        : { id: itemId, label: "—", exists: false };
+        ? {
+            id: itemId,
+            practiceId,
+            label: getNoteLabel(chord.name),
+            exists: true,
+            confidence: getConfidence(practiceId),
+            isSelected: !!selection?.selectedIds.has(practiceId),
+          }
+        : {
+            id: itemId,
+            practiceId,
+            label: "—",
+            exists: false,
+            confidence: 0 as const,
+            isSelected: false,
+          };
     }
 
+    const practiceId = getScalePracticeId(itemId);
     return {
       id: itemId,
+      practiceId,
       label: formatScaleLabel(noteLabel, type),
       exists: true,
+      confidence: getConfidence(practiceId),
+      isSelected: !!selection?.selectedIds.has(practiceId),
     };
   };
+
+  const getPracticeIds = (cells: { noteLabel: string; type: string }[]) =>
+    cells
+      .map(({ noteLabel, type }) => getCellData(noteLabel, type))
+      .filter((cell) => cell.exists)
+      .map((cell) => cell.practiceId);
+
+  const handleItemClick = (itemId: string, practiceId: string) => {
+    if (selection) selection.onToggle([practiceId]);
+    else onItemClick(itemId);
+  };
+
+  const handleColumnClick = (type: string) =>
+    selection?.onToggle(
+      getPracticeIds(notes.map((n) => ({ noteLabel: n.note, type })))
+    );
+
+  const handleRowClick = (noteLabel: string) =>
+    selection?.onToggle(
+      getPracticeIds(Object.keys(types).map((type) => ({ noteLabel, type })))
+    );
 
   return {
     viewMode,
@@ -91,5 +116,8 @@ export const useMusicTableModel = (
     notes,
     getCellData,
     handleItemClick,
+    handleColumnClick,
+    handleRowClick,
+    isSelecting: !!selection,
   };
 };

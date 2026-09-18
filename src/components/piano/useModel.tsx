@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useAudio, type NoteSpec } from "../../contexts/AudioContext";
-import { useNotes } from "../../data/notes";
+import { NOTES, useNotes } from "../../data/notes";
 import type { KeyAnnotation, ViewMode } from "../modals/useModel";
 
 export interface UsePianoKeysProps {
@@ -9,6 +9,21 @@ export interface UsePianoKeysProps {
   viewMode?: ViewMode;
   type?: "chord" | "scale";
 }
+
+const STARTING_OCTAVE = 2;
+
+// keyIndex counts semitones up from C in the starting octave
+export const annotationsToNoteSpecs = (
+  annotations: KeyAnnotation[],
+  octaves = 3
+): NoteSpec[] =>
+  annotations
+    .filter((a) => a.keyIndex >= 0 && a.keyIndex < octaves * 12)
+    .map((a) => ({
+      note: NOTES[a.keyIndex % 12].noteFlat,
+      octave: STARTING_OCTAVE + Math.floor(a.keyIndex / 12),
+      keyIndex: a.keyIndex,
+    }));
 
 export const usePianoKeys = ({
   annotations = [],
@@ -19,12 +34,11 @@ export const usePianoKeys = ({
 
   // Expand keys across N octaves
   const keys = useMemo(() => {
-    const startingOctave = 2;
     return Array.from({ length: octaves }, (_, octave) =>
       notes.map((k, i) => ({
         ...k,
         keyIndex: i + octave * 12,
-        octave: startingOctave + octave,
+        octave: STARTING_OCTAVE + octave,
       }))
     ).flat();
   }, [notes, octaves]);
@@ -32,17 +46,7 @@ export const usePianoKeys = ({
   useEffect(() => {
     if (!annotations.length) return;
 
-    const notesToPlay = annotations
-      .map((a) => {
-        const key = keys.find((k) => k.keyIndex === a.keyIndex);
-        if (!key) return null;
-        return {
-          note: key.audioNote,
-          octave: key.octave,
-          keyIndex: key.keyIndex,
-        };
-      })
-      .filter(Boolean) as NoteSpec[];
+    const notesToPlay = annotationsToNoteSpecs(annotations, octaves);
 
     setNotesToPlay((prev) => {
       const isEqual =
@@ -53,7 +57,7 @@ export const usePianoKeys = ({
         );
       return isEqual ? prev : notesToPlay;
     });
-  }, [annotations, keys, setNotesToPlay]);
+  }, [annotations, octaves, setNotesToPlay]);
 
   const handlePlayNote = (key: NoteSpec) => {
     playNotes([key], "chord");

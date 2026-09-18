@@ -1,5 +1,7 @@
 import { Volume2 } from "lucide-react";
 import { useAudio } from "../../../contexts/AudioContext";
+import type { Confidence } from "../../../lib/progress";
+import { ConfidenceIndicator } from "../../practice/ConfidenceIndicator";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { DialogHeader, DialogTitle } from "../../ui/dialog";
@@ -8,9 +10,15 @@ interface MusicHeaderProps {
   title: string;
   notes: string[];
   onPlay?: () => void;
+  confidence?: Confidence;
 }
 
-export const MusicHeader = ({ title, notes, onPlay }: MusicHeaderProps) => {
+export const MusicHeader = ({
+  title,
+  notes,
+  onPlay,
+  confidence,
+}: MusicHeaderProps) => {
   const { isAudioReady } = useAudio();
 
   const Badges = () => {
@@ -34,6 +42,9 @@ export const MusicHeader = ({ title, notes, onPlay }: MusicHeaderProps) => {
       <div className="flex flex-col items-center gap-2">
         <div className="flex items-center gap-2">
           <DialogTitle className="text-2xl font-bold">{title}</DialogTitle>
+          {confidence !== undefined && (
+            <ConfidenceIndicator confidence={confidence} size="md" />
+          )}
           <div className="flex gap-1 show-mobile-landscape">
             <Badges />
           </div>
